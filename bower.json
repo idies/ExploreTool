@@ -1,0 +1,15 @@
+ {
+  "name": "sqlsearchwp",
+  "version": "1.0.0",
+  "homepage": "http://voyages.sdss.org",
+  "authors": [
+    "Bonnie Souter <bsouter@jhu.edu>"
+  ],
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "vendor"
+  ]
+}

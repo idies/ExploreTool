@@ -1,0 +1,39 @@
+{
+  "name": "SQLSearchWP-Casjobs",
+  "version": "1.0.0",
+  "author": "Bonnie Souter <bsouter@jhu.edu>, William Harrington <wharrin3@jhu.edu>",
+  "description": "SDSS SQLSearch Plugin for WordPress",
+  "license": "MIT",
+  "homepage": "http://voyages.sdss.org",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/idies/SQLSearchWP-Casjobs.git"
+  },
+  "licenses": [
+    {
+      "type": "MIT",
+      "url": "http://opensource.org/licenses/MIT"
+    }
+  ],
+  "scripts": {
+    "postinstall": "node node_modules/bower/bin/bower install && grunt dev"
+  },
+  "engines": {
+    "node": ">= 0.10.2"
+  },
+  "devDependencies": {
+    "bower": ">=1.7.7",
+    "grunt": ">=0.4.0",
+    "grunt-postcss": ">=0.7.0",
+    "pixrem": ">=3.0.0",
+    "autoprefixer": ">=6.3.3",
+    "grunt-cssnano": ">=2.0.1",
+    "grunt-contrib-concat": ">=1.0.0",
+    "grunt-contrib-jshint": ">=1.0.0",
+    "grunt-contrib-less": ">=1.2.0",
+    "grunt-contrib-uglify": ">=0.11.1",
+    "grunt-contrib-watch": ">=0.6.1",
+    "load-grunt-tasks": ">=3.4.0",
+    "time-grunt": ">=1.3.0"
+  }
+}

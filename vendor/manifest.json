@@ -1,0 +1,14 @@
+{
+  "dest": "assets/manifest.json",
+  "querystring": true,
+  "assets/css/main.min.css": {
+    "path": "assets/css/main.min.css",
+    "hash": "738369dd44e8cc738856f72f9c69e571",
+    "handle": "axiomz_css"
+  },
+  "assets/js/scripts.min.js": {
+    "path": "assets/js/scripts.min.js",
+    "hash": "5037f16b4d54d3a98401414b579eedf9",
+    "handle": "axiomz_js"
+  }
+}
