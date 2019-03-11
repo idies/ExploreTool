@@ -1,4 +1,4 @@
-/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-03-08 */+function ($) {
+/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-03-11 */+function ($) {
   'use strict';
 
   // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
@@ -1386,7 +1386,7 @@
 		    success: function (data) {
 				var dict = explore.convertDict(data);
 				explore.displayData( dict , true);
-				explore.displayImaging(dict, true);
+				explore.toBin(dict);
 		    }
 		}
 		},
@@ -1448,6 +1448,7 @@
 		 * @param Boolean $append Append or replace current message(s)
 		**/
 		displayData: function( dict , show) {
+			console.log(dict.flags);
 			var container = $("#ex-data");
 			var contents = explore.formatLineOne(dict);
 			contents += ('<br>' + explore.formatLineTwo(dict));
@@ -1455,9 +1456,9 @@
 			explore.doCollapse(explore.context + ' .ex-data-wrap>h2>a[data-toggle]', $("#ex-data-outer"), show );
 		},
 		
-		displayImaging: function( dict, show) {
+		displayImaging: function( dict, binFlags, show) {
 			var container = $("#ex-imaging");
-			var contents = explore.formatImaging(dict);
+			var contents = explore.formatImaging(dict, binFlags);
 			$(container).html(contents);
 			explore.doCollapse(explore.context + ' .ex-imaging-wrap>h2>a[data-toggle]', $("#ex-imaging-outer"), show );
 		},
@@ -1500,8 +1501,93 @@
 			
 		},
 		
-		formatImaging: function(dict) {
-			return "";
+		formatImaging: function(dict, binFlags) {
+			var output = '<table class="table-bordered table-responsive"><tr><th>Flags</th><td>' + explore.generateFlags(binFlags) + '</td></tr></table>';
+			return output;
+		},
+		
+		generateFlags: function(binFlags) {
+			var flags = {'CANONICAL_CENTER': '0',
+			'BRIGHT': '1',
+			'EDGE': '2',
+			'BLENDED': '3',
+			'CHILD': '4',
+			'PEAKCENTER': '5',
+			'NODEBLEND': '6',
+			'NOPROFILE': '7',
+			'NOPETRO': '8',
+			'MANYPETRO': '9',
+			'NOPETRO_BIG': '10',
+			'DEBLEND_TOO_MANY_PEAKS': '11',
+			'CR': '12',
+			'MANYR50': '13',
+			'MANYR90': '14',
+			'BAD_RADIAL': '15',
+			'INCOMPLETE_PROFILE': '16',
+			'INTERP': '17',
+			'SATUR': '18',
+			'NOTCHECKED': '19',
+			'SUBTRACTED': '20',
+			'NOSTOKES': '21',
+			'BADSKY': '22',
+			'PETROFAINT': '23',
+			'TOO_LARGE': '24',
+			'DEBLENDED_AS_PSF': '25',
+			'DEBLEND_PRUNED': '26',
+			'ELLIPFAINT': '27',
+			'BINNED1': '28',
+			'BINNED2': '29',
+			'BINNED4': '30',
+			'MOVED': '31',
+			'DEBLENDED_AS_MOVING': '32',
+			'NODEBLEND_MOVING': '33',
+			'TOO_FEW_DETECTIONS': '34',
+			'BAD_MOVING_FIT': '35',
+			'STATIONARY': '36',
+			'PEAKS_TOO_CLOSE': '37',
+			'BINNED_CENTER': '38',
+			'LOCAL_EDGE': '39',
+			'BAD_COUNTS_ERROR': '40',
+			'BAD_MOVING_FIT_CHILD': '41',
+			'DEBLEND_UNASSIGNED_FLUX': '42',
+			'SATUR_CENTER': '43',
+			'INTERP_CENTER': '44',
+			'DEBLENDED_AT_EDGE': '45',
+			'DEBLEND_NOPEAK': '46',
+			'PSF_FLUX_INTERP': '47',
+			'TOO_FEW_GOOD_DETECTIONS': '48',
+			'CENTER_OFF_AIMAGE': '49',
+			'DEBLEND_DEGENERATE': '50',
+			'BRIGHTEST_GALAXY_CHILD': '51',
+			'CANONICAL_BAND': '52',
+			'AMOMENT_UNWEIGHTED': '53',
+			'AMOMENT_SHIFT': '54',
+			'AMOMENT_MAXITER': '55',
+			'MAYBE_CR': '56',
+			'MAYBE_EGHOST': '57',
+			'NOTCHECKED_CENTER': '58',
+			'HAS_SATUR_DN': '59',
+			'DEBLEND_PEEPHOLE': '60'};
+			var toReturn = "";
+			for(var key in flags) {
+				var value = binFlags.charAt(binFlags.length - (parseInt(flags[key]) + 1));
+				if(value === "1") {
+					toReturn += (key + " ");
+				}
+			}
+			return toReturn;
+		},
+		
+		toBin: function(dict) {
+			var str_num = dict.flags;
+			$.ajax({
+				type: 'GET',
+				url: $('#ex-container').data('ex-webroot') + '/convert.php',
+				data:{'input': str_num},
+				success: function (data) {
+					explore.displayImaging(dict, data, true);
+				}
+			});
 		},
 		
 		decToSexagesimal: function(num) {
