@@ -1,4 +1,4 @@
-/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-03-11 */+function ($) {
+/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-03-15 */+function ($) {
   'use strict';
 
   // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
@@ -1416,7 +1416,7 @@
 		
 		displayInitial: function() {
 			var target = explore.targets.data;
-			target.data.Query = "SELECT dbo.fPhotoTypeN(p.type) AS Type, p.ra, p.dec, p.run, p.rerun, p.camcol, p.field, p.obj, p.specObjID, p.objID, p.l, p.b, p.type, p.u, p.g, p.r, p.i, p.z, p.err_u, p.err_g, p.err_r, p.err_i, p.err_z, p.flags, p.mjd AS ImageMJD, p.mode, p.parentID, p.nChild, p.extinction_r, p.petroRad_r, p.petroRadErr_r, Photoz.z AS Photoz, Photoz.zerr AS Photoz_err, zooSpec.spiral AS Zoo1Morphology_spiral, zooSpec.elliptical AS Zoo1Morphology_elliptical, zooSpec.uncertain AS Zoo1Morphology_uncertain, s.instrument, s.class, s.z, s.zErr, s.survey, s.programname, s.sourcetype, s.velDisp, s.velDispErr, s.plate, s.mjd AS specMJD, s.fiberID FROM PhotoObj AS p LEFT JOIN Photoz ON Photoz.objID = p.objID LEFT JOIN zooSpec ON zooSpec.objID = p.objID LEFT JOIN SpecObj AS s ON s.specObjID = p.specObjID WHERE p.objID=1237662301903192106";
+			target.data.Query = "SELECT dbo.fPhotoTypeN(p.type) AS Type, p.ra, p.dec, p.run, p.rerun, p.camcol, p.field, p.obj, p.specObjID, p.objID, p.l, p.b, p.type, p.u, p.g, p.r, p.i, p.z AS pz, p.err_u, p.err_g, p.err_r, p.err_i, p.err_z, p.flags, p.mjd AS ImageMJD, dbo.fMjdToGMT(p.mjd) AS ImageMJDString, dbo.fPhotoModeN(p.mode) AS Mode, p.parentID, p.nChild, p.extinction_r, p.petroRad_r, p.petroRadErr_r, Photoz.z AS Photoz, Photoz.zerr AS Photoz_err, zooSpec.spiral AS Zoo1Morphology_spiral, zooSpec.elliptical AS Zoo1Morphology_elliptical, zooSpec.uncertain AS Zoo1Morphology_uncertain, s.instrument, s.class, s.z, s.zErr, s.survey, s.programname, s.sourcetype, s.velDisp, s.velDispErr, s.plate, s.mjd AS specMJD, s.fiberID FROM PhotoObj AS p LEFT JOIN Photoz ON Photoz.objID = p.objID LEFT JOIN zooSpec ON zooSpec.objID = p.objID LEFT JOIN SpecObj AS s ON s.specObjID = p.specObjID WHERE p.objID=1237662301903192106";
 			$.ajax(target);
 		},
 		
@@ -1502,7 +1502,26 @@
 		},
 		
 		formatImaging: function(dict, binFlags) {
-			var output = '<table class="table-bordered table-responsive"><tr><th>Flags</th><td>' + explore.generateFlags(binFlags) + '</td></tr></table>';
+			var output = '<table class="table-bordered table-responsive"><tr><th><a href="https://www.sdss.org/dr15/algorithms/photo_flags_recommend/" target="_blank">Flags</a></th><td>' + explore.generateFlags(binFlags) + '</td></tr></table>';
+			output += ('<img style="-webkit-user-select: none;" src="http://skyserver.sdss.org/dr15/SkyServerWS/ImgCutout/getjpeg?TaskName=Skyserver.Explore.Image&ra='+dict.ra+'&dec='+dict.dec+'&scale=0.2&width=256&height=256&opt=G" width="256" height="256" class="left">');
+			output += '<div class="im-table"><table class="table-bordered table-responsive"><tr><th colspan="5" style="text-align:center">Magnitudes</th></tr><tr><td>u</td><td>g</td><td>r</td><td>i</td><td>z</td></tr>';
+			output += ('<tr><td>'+dict.u+'</td><td>'+dict.g+'</td><td>'+dict.r+'</td><td>'+dict.i+'</td><td>'+dict.pz+'</td></tr></table>');
+			output += '<table class="table-bordered table-responsive"><tr><th colspan="5" style="text-align:center">Magnitude Uncertainties</th></tr><tr><td>err_u</td><td>err_g</td><td>err_r</td><td>err_i</td><td>err_z</td></tr>';
+			output += ('<tr><td>'+dict.err_u+'</td><td>'+dict.err_g+'</td><td>'+dict.err_r+'</td><td>'+dict.err_i+'</td><td>'+dict.err_z+'</td></tr></table></div>');
+			output += ('<br><a target="_blank" href="http://skyserver.sdss.org/dr15/en/tools/chart/navi.aspx?'+'ra='+dict.ra+'&dec='+dict.dec+'&scale=0.2&width=256&height=256">View in Navigation Tool</a>');
+			output += '<br><table class="table-bordered table-responsive"><tr><td>Image MJD</td><td>mode</td><td>parentID</td><td>nChild</td><td>extinction_r</td><td>PetroRad_r (arcsec)</td></tr>';
+			output += ('<tr><td>'+dict.ImageMJD+'</td><td>'+dict.Mode+'</td><td>'+dict.parentID+'</td><td>'+dict.nChild+'</td><td>'+dict.extinction_r+'</td><td>'+dict.petroRad_r+' &#177; '+dict.petroRadErr_r+'</td></tr></table>');
+			output += '<table class="table-bordered table-responsive"><tr><td>Mjd-Date</td><td>photoZ (KD-tree method)</td><td>Galaxy Zoo 1 morphology</td></tr>';
+			var spiral = parseInt(dict.Zoo1Morphology_spiral);
+			var elliptical = parseInt(dict.Zoo1Morphology_elliptical);
+			var display = "Uncertain";
+			if(spiral === 1 || spiral > elliptical) {
+				display = "Spiral";
+			} else if(elliptical === 1 || elliptical > spiral) {
+				display = "Elliptical";
+			}
+			var dates = dict.ImageMJDString.split(" ");
+			output += ('<tr><td>'+dates[0]+'</td><td>'+dict.Photoz+' &#177; '+dict.Photoz_err+'</td><td>'+display+'</td></tr></table>');
 			return output;
 		},
 		
@@ -1519,7 +1538,7 @@
 			'MANYPETRO': '9',
 			'NOPETRO_BIG': '10',
 			'DEBLEND_TOO_MANY_PEAKS': '11',
-			'CR': '12',
+			'COSMIC_RAY': '12',
 			'MANYR50': '13',
 			'MANYR90': '14',
 			'BAD_RADIAL': '15',

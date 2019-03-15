@@ -17,7 +17,6 @@ $result .= '<div class="row">
 							<div id="ex-data" class="ex-data">
 							</div>
 						</div>
-						</div>
 					</div>
 					<div class="ex-imaging-wrap">
 						<a name="imaging" role="button" data-toggle="collapse" href="#ex-imaging-outer" aria-expanded="false" aria-controls="ex-imaging">Imaging</a>
