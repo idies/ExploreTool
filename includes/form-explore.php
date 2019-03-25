@@ -24,6 +24,31 @@ $result .= '<div class="row">
 							<div id="ex-imaging" class="ex-imaging">
 							</div>
 						</div>
+					</div>
+					<div class="ex-cross-wrap">
+						<a name="cross" role="button" data-toggle="collapse" href="#ex-cross-outer" aria-expanded="false" aria-controls="ex-cross">Cross-identifications</a>
+						<div id="ex-cross-outer" class="ex-cross-outer collapse">
+							<div id="ex-cross" class="ex-cross">
+								<div id="ex-cross-USNO">
+								</div>
+								<div id="ex-cross-FIRST">
+								</div>
+								<div id="ex-cross-ROSAT">
+								</div>
+								<div id="ex-cross-RC3">
+								</div>
+								<div id="ex-cross-TwoMASS">
+								</div>
+								<div id="ex-cross-WISE">
+								</div>
+							</div>
+						</div>
+					</div>
+					<div class="ex-spectra-wrap">
+						<a name="spectra" role="button" data-toggle="collapse" href="#ex-spectra-outer" aria-expanded="false" aria-controls="ex-spectra">Optical Spectra</a>
+						<div id="ex-spectra-outer" class="ex-spectra-outer collapse">
+							<div id="ex-spectra" class="ex-spectra">
+							</div>
 						</div>
 					</div>
 				</form>

@@ -1,4 +1,4 @@
-/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-03-15 */+function ($) {
+/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-03-25 */+function ($) {
   'use strict';
 
   // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
@@ -1388,35 +1388,150 @@
 				explore.displayData( dict , true);
 				explore.toBin(dict);
 		    }
+		},
+		USNO:{
+			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
+			ContentType:"application/json",
+			type: "POST",
+		    data:{"Query":"","Accept":"application/xml"},
+			success: function (data) {
+				if(data === "\n") {
+					data = "There is no USNO data available for this object";
+					$("#ex-cross-USNO").html(data);
+				} else {
+					var dict = explore.convertDict(data);
+					explore.displayUSNO( dict , true);
+				}
+		    }
+		},
+		FIRST:{
+			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
+			ContentType:"application/json",
+			type: "POST",
+		    data:{"Query":"","Accept":"application/xml"},
+			success: function (data) {
+				if(data === "\n") {
+					data = "There is no FIRST data available for this object";
+					$("#ex-cross-FIRST").html(data);
+				} else {
+					var dict = explore.convertDict(data);
+					explore.displayFIRST( dict , true);
+				}
+		    }
+		},
+		ROSAT:{
+			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
+			ContentType:"application/json",
+			type: "POST",
+		    data:{"Query":"","Accept":"application/xml"},
+			success: function (data) {
+				if(data === "\n") {
+					data = "There is no ROSAT data available for this object";
+					$("#ex-cross-ROSAT").html(data);
+				} else {
+					var dict = explore.convertDict(data);
+					explore.displayROSAT( dict , true);
+				}
+		    }
+		},
+		RC3:{
+			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
+			ContentType:"application/json",
+			type: "POST",
+		    data:{"Query":"","Accept":"application/xml"},
+			success: function (data) {
+				if(data === "\n") {
+					data = "There is no RC3 data available for this object";
+					$("#ex-cross-RC3").html(data);
+				} else {
+					var dict = explore.convertDict(data);
+					explore.displayRC3( dict , true);
+				}
+		    }
+		},
+		TwoMASS:{
+			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
+			ContentType:"application/json",
+			type: "POST",
+		    data:{"Query":"","Accept":"application/xml"},
+			success: function (data) {
+				if(data === "\n") {
+					data = "There is no TwoMASS data available for this object";
+					$("#ex-cross-TwoMASS").html(data);
+				} else {
+					var dict = explore.convertDict(data);
+					explore.displayTwoMASS( dict , true);
+				}
+		    }
+		},
+		WISE:{
+			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
+			ContentType:"application/json",
+			type: "POST",
+		    data:{"Query":"","Accept":"application/xml"},
+			success: function (data) {
+				if(data === "\n") {
+					data = "There is no WISE data available for this object";
+					$("#ex-cross-WISE").html(data);
+				} else {
+					var dict = explore.convertDict(data);
+					explore.displayWISE( dict , true);
+				}
+		    }
+		},
+		spectra:{
+			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
+			ContentType:"application/json",
+			type: "POST",
+		    data:{"Query":"","Accept":"application/xml"},
+			success: function (data) {
+				if(data === "\n") {
+					data = "There is no Optical Spectra data available for this object";
+					$("#ex-spectra").html(data);
+				} else {
+					var dict = explore.convertDict(data);
+					explore.displaySpectra( dict , true);
+				}
+		    }
 		}
 		},
 			
 		init: function(){
-			// get base url of files, test or prod query, target query location, and how to show results.
-			//var webroot = $( "#ex-container" ).data('ex-webroot');
-			//var which = $( "#ex-container" ).data('ex-which');
-			//var target = explore.targets[which];
-			// Show the Search Page
 			this.displayInitial();
 			this.showForm( explore.context , false , true );
-			// Prevent form submitting/reloading page
-			//$(".ex-form", explore.context).on( "submit" , function( e ){ e.preventDefault(); });
-			//$(".ex-searchform", explore.context).on( "submit" , function( e ){ e.preventDefault(); });
-			
-			// Add (delegated) click event handlers to buttons
-			//$(".ex-edit", explore.context).on('click', explore.enableQuery);
-			//$(".ex-query", explore.context).on('input', explore.doQueryUpdate);
-			//$(".ex-download", explore.context).on('click', explore.download);
-			//$(".ex-newWindow", explore.context).on('change', explore.updateCheckbox);
-			//$(".ex-submit", explore.context).on( "click" , { target:target , which:which } , explore.doSubmit );
-			//$(".ex-syntax", explore.context).on( "click" , explore.doSyntax );
-			//$(".ex-reset", explore.context).on( "click" , explore.doReset );
-			
 		},
 		
 		displayInitial: function() {
 			var target = explore.targets.data;
 			target.data.Query = "SELECT dbo.fPhotoTypeN(p.type) AS Type, p.ra, p.dec, p.run, p.rerun, p.camcol, p.field, p.obj, p.specObjID, p.objID, p.l, p.b, p.type, p.u, p.g, p.r, p.i, p.z AS pz, p.err_u, p.err_g, p.err_r, p.err_i, p.err_z, p.flags, p.mjd AS ImageMJD, dbo.fMjdToGMT(p.mjd) AS ImageMJDString, dbo.fPhotoModeN(p.mode) AS Mode, p.parentID, p.nChild, p.extinction_r, p.petroRad_r, p.petroRadErr_r, Photoz.z AS Photoz, Photoz.zerr AS Photoz_err, zooSpec.spiral AS Zoo1Morphology_spiral, zooSpec.elliptical AS Zoo1Morphology_elliptical, zooSpec.uncertain AS Zoo1Morphology_uncertain, s.instrument, s.class, s.z, s.zErr, s.survey, s.programname, s.sourcetype, s.velDisp, s.velDispErr, s.plate, s.mjd AS specMJD, s.fiberID FROM PhotoObj AS p LEFT JOIN Photoz ON Photoz.objID = p.objID LEFT JOIN zooSpec ON zooSpec.objID = p.objID LEFT JOIN SpecObj AS s ON s.specObjID = p.specObjID WHERE p.objID=1237662301903192106";
+			$.ajax(target);
+			
+			target = explore.targets.USNO;
+			target.data.Query = "select PROPERMOTION, MURAERR, MUDECERR, ANGLE from USNO where OBJID=1237662301903192106";
+			$.ajax(target);
+			
+			target = explore.targets.FIRST;
+			target.data.Query = "select f.peak,f.rms,f.major,f.minor from FIRST f where f.objID=1237662301903192106";
+			$.ajax(target);
+			
+			target = explore.targets.ROSAT;
+			target.data.Query = "select q.CPS, q.HR1,q.HR2,q.EXT from ROSAT q where q.OBJID=1237662301903192106";
+			$.ajax(target);
+			
+			target = explore.targets.RC3;
+			target.data.Query = "select r.HUBBLE, r.M21, r.M21ERR, r.HI from RC3 r where r.objID=1237662301903192106";
+			$.ajax(target);
+			
+			target = explore.targets.TwoMASS;
+			target.data.Query = "select j,h,k, phQual from TwoMASS s where s.OBJID=1237662301903192106";
+			$.ajax(target);
+			
+			target = explore.targets.WISE;
+			target.data.Query = "select TwoMASS.OBJID, t.w1mag, t.w2mag, t.w3mag, t.w4mag from WISE_allsky t, TwoMASS where t.tmass_key=TwoMASS.ptsKey and TwoMASS.OBJID=1237662301903192106";
+			$.ajax(target);
+			
+			target = explore.targets.spectra;
+			target.data.Query = "select a.specObjID, a.img, a.fiberID, a.mjd, a.plate, a.survey, a.programname, a.instrument,a.sourceType,a.z, a.zErr, a.class as CLASS, a.velDisp, a.velDispErr from SpecObjAll a where bestObjID=1237662301903192106";
 			$.ajax(target);
 		},
 		
@@ -1461,6 +1576,95 @@
 			var contents = explore.formatImaging(dict, binFlags);
 			$(container).html(contents);
 			explore.doCollapse(explore.context + ' .ex-imaging-wrap>h2>a[data-toggle]', $("#ex-imaging-outer"), show );
+		},
+		
+		displayUSNO: function(dict, show) {
+			var container = $("#ex-cross-USNO");
+			var contents = explore.formatUSNO(dict);
+			$(container).html(contents);
+		},
+		
+		displayFIRST: function(dict, show) {
+			var container = $("#ex-cross-FIRST");
+			var contents = explore.formatFIRST(dict);
+			$(container).html(contents);
+		},
+		
+		displayROSAT: function(dict, show) {
+			var container = $("#ex-cross-ROSAT");
+			var contents = explore.formatROSAT(dict);
+			$(container).html(contents);
+		},
+		
+		displayRC3: function(dict, show) {
+			var container = $("#ex-cross-RC3");
+			var contents = explore.formatRC3(dict);
+			$(container).html(contents);
+		},
+		
+		displayTwoMASS: function(dict, show) {
+			var container = $("#ex-cross-TwoMASS");
+			var contents = explore.formatTwoMASS(dict);
+			$(container).html(contents);
+		},
+		
+		displayWISE: function(dict, show) {
+			var container = $("#ex-cross-WISE");
+			var contents = explore.formatWISE(dict);
+			$(container).html(contents);
+		},
+		
+		displaySpectra: function(dict, show) {
+			var container = $("#ex-spectra");
+			var contents = explore.formatSpectra(dict);
+			$(container).html(contents);
+		},
+		
+		formatSpectra: function(dict, show) {
+			var output = '<strong>SpecObjID</strong> = ' + dict.specObjID +'<br>';
+			output += ('<img style="-webkit-user-select: none;" src="http://skyserver.sdss.org/dr15/en/get/SpecById.ashx?id='+dict.specObjID+'" width="400" height="400" class="left">');
+			output += ('<div class="spectra-table"><table class="table-bordered table-responsive"><tr><th>Spectrograph</th><td></td></tr><tr><th>class</th><td>'+dict.CLASS+'</td></tr><tr><th>Redshift (z)</th><td>'+dict.z+'</td></tr>');
+			output += ('<tr><th>Redshift error</th><td>'+dict.zErr+'</td></tr><tr><th>Redshift flags</th><td></td></tr><tr><th>survey</th><td>'+dict.survey+'</td></tr><tr><th>programname</th><td>'+dict.programname+'</td></tr><tr><th>primary</th><td></td></tr>');
+			output += ('<tr><th>Other spec</th><td></td></tr><tr><th>sourcetype</th><td>'+dict.sourceType+'</td></tr><tr><th>Velocity dispersion (km/s)</th><td>'+dict.velDisp+'</td></tr><tr><th>veldisp_error</th><td>'+dict.velDispErr+'</td></tr>');
+			output += ('<tr><th>targeting_flags</th><td></td></tr><tr><th>plate</th><td>'+dict.plate+'</td></tr><tr><th>mjd</th><td>'+dict.mjd+'</td></tr><tr><th>fiberid</th><td>'+dict.fiberID+'</td></tr></table></div>');
+			return output;
+		},
+		
+		formatWISE: function(dict, show) {
+			var output = '<table class="table-bordered table-responsive"><tr><th>Catalog</th><th>w1mag</th><th>w2mag</th><th>w3mag</th><th>w4mag</th><th>Full WISE data</th></tr>';
+			output += ('<tr><td>WISE</td><td>'+dict.w1mag+'</td><td>'+dict.w2mag+'</td><td>'+dict.w3mag+'</td><td>'+dict.w4mag+'</td><td><a href="http://skyserver.sdss.org/dr15/en/tools/explore/DisplayResults.aspx?id='+dict.OBJID+'&name=wiseLinkCrossId" target="_blank">Link</a></td></tr></table>');
+			return output;
+		},
+		
+		formatTwoMASS: function(dict, show) {
+			var output = '<table class="table-bordered table-responsive"><tr><th>Catalog</th><th>J</th><th>H</th><th>K_s</th><th>phQual</th></tr>';
+			output += ('<tr><td>TwoMASS</td><td>'+dict.j+'</td><td>'+dict.h+'</td><td>'+dict.k+'</td><td>'+dict.phQual+'</td></tr></table>');
+			return output;
+		},
+		
+		formatRC3: function(dict, show) {
+			var output = '<table class="table-bordered table-responsive"><tr><th>Catalog</th><th>Hubble type</th><th>21 cm magnitude</th><th>Neutral Hydrogen Index</th></tr>';
+			output += ('<tr><td>RC3</td><td>'+dict.HUBBLE+'</td><td>'+dict.M21+' &#177; '+dict.M21ERR+'</td><td>'+dict.HI+'</td></tr></table>');
+			return output;
+		},
+		
+		formatROSAT: function(dict, show) {
+			var output = '<table class="table-bordered table-responsive"><tr><th>Catalog</th><th>cps</th><th>hr1</th><th>hr2</th><th>ext</th></tr>';
+			output += ('<tr><td>ROSAT</td><td>'+dict.CPS+'</td><td>'+dict.HR1+'</td><td>'+dict.HR2+'</td><td>'+dict.EXT+'</td></tr></table>');
+			return output;
+		},
+		
+		formatFIRST: function(dict) {
+			var output = '<table class="table-bordered table-responsive"><tr><th>Catalog</th><th>Peak Flux (mJy)</th><th>Major axis (arcsec)</th><th>Minor axis (arcsec)</th></tr>';
+			output += ('<tr><td>FIRST</td><td>'+dict.peak+' &#177; '+dict.rms+'</td><td>'+dict.major+'</td><td>'+dict.minor+'</td></tr></table>');
+			return output;
+		},
+		
+		formatUSNO: function(dict) {
+			var output = '<table class="table-bordered table-responsive"><tr><th>Catalog</th><th>Proper Motion (mas/yr)</th><th>PM angle (deg E)</th></tr>';
+			var pm = (parseFloat(dict.PROPERMOTION)*10.0).toFixed(2).toString();
+			output += ('<tr><td>USNO</td><td>'+pm+' &#177; '+dict.MURAERR+'</td><td>'+dict.ANGLE+'</td></tr></table>');
+			return output;
 		},
 		
 		convertDict: function(data) {
