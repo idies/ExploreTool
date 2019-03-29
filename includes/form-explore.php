@@ -51,6 +51,20 @@ $result .= '<div class="row">
 							</div>
 						</div>
 					</div>
+					<div class="ex-manga-wrap">
+						<a name="manga" role="button" data-toggle="collapse" href="#ex-manga-outer" aria-expanded="false" aria-controls="ex-manga">MaNGA observation(s)</a>
+						<div id="ex-manga-outer" class="ex-manga-outer collapse">
+							<div id="ex-manga" class="ex-manga">
+							</div>
+						</div>
+					</div>
+					<div class="ex-apogee-wrap">
+						<a name="apogee" role="button" data-toggle="collapse" href="#ex-apogee-outer" aria-expanded="false" aria-controls="ex-apogee">Apogee Infrared Spectra</a>
+						<div id="ex-apogee-outer" class="ex-apogee-outer collapse">
+							<div id="ex-apogee" class="ex-apogee">
+							</div>
+						</div>
+					</div>
 				</form>
 			</div>
 		</div>

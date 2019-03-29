@@ -136,6 +136,21 @@
 					explore.displaySpectra( dict , true);
 				}
 		    }
+		},
+		manga:{
+			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
+			ContentType:"application/json",
+			type: "POST",
+		    data:{"Query":"","Accept":"application/xml"},
+			success: function (data) {
+				if(data === "\n") {
+					data = "There is no MaNGA data available for this object";
+					$("#ex-manga").html(data);
+				} else {
+					var dict = explore.convertDict(data);
+					explore.displayManga( dict , true);
+				}
+		    }
 		}
 		},
 			
@@ -174,7 +189,12 @@
 			$.ajax(target);
 			
 			target = explore.targets.spectra;
-			target.data.Query = "select a.specObjID, a.img, a.fiberID, a.mjd, a.plate, a.survey, a.programname, a.instrument,a.sourceType,a.z, a.zErr, a.class as CLASS, a.velDisp, a.velDispErr from SpecObjAll a where bestObjID=1237662301903192106";
+			//Still need to find function for legacy_target2
+			target.data.Query = "select a.specObjID, a.img, a.fiberID, a.mjd, a.plate, a.survey, a.programname, a.instrument,a.sourceType,a.z, a.zErr, dbo.fSpecZWarningN(a.zWarning) as WARNING, a.sciencePrimary, dbo.fPrimTargetN(a.legacy_target1) as targetOne, a.legacy_target2 as targetTwo, a.class as CLASS, a.velDisp, a.velDispErr from SpecObjAll a where bestObjID=1237662301903192106";
+			$.ajax(target);
+			
+			target = explore.targets.manga;
+			target.data.Query = 'select top 1 h.ifura, h.ifudec, h.mangaid, h.mngtarg1, h.mngtarg2, h.mngtarg3,h.objdec, h.objra, h.plateifu, h.mjdmax, h.redsn2, h.drp3qual, h.bluesn2 from mangaDRPall h';
 			$.ajax(target);
 		},
 		
@@ -263,35 +283,60 @@
 			$(container).html(contents);
 		},
 		
-		formatSpectra: function(dict, show) {
+		displayManga: function(dict, show) {
+			var container = $("#ex-manga");
+			var contents = explore.formatManga(dict);
+			$(container).html(contents);
+		},
+		
+		formatManga: function(dict) {
+			var PlateIFU = (dict.plateifu).split("-");
+			var imLink = '"https://dr15.sdss.org/sas/dr15/manga/spectro/redux/v2_4_3/'+PlateIFU[0]+'/stack/images/'+PlateIFU[1]+'.png"';
+			var LINLink = '"http://data.sdss.org/sas/dr15/manga/spectro/redux/v2_4_3/'+PlateIFU[0]+'/stack/manga-'+dict.plateifu+'-LINCUBE.fits.gz"';
+			var LOGLink = '"http://data.sdss.org/sas/dr15/manga/spectro/redux/v2_4_3/'+PlateIFU[0]+'/stack/manga-'+dict.plateifu+'-LOGCUBE.fits.gz"';
+			var ExpLink = '"http://sas.sdss.org/marvin/galaxy/'+dict.plateifu+'"';
+			var output = '<div><table class="table-responsive"><tr><td><a href='+imLink+' target="_blank">View Larger</a></td>';
+			output += ('<td><a href='+LINLink+'>LIN Data Cube</a></td>');
+			output += ('<td><a href='+LOGLink+'>LOG Data Cube</a></td>');
+			output += ('<td><a href='+ExpLink+' target="_blank">Explore in Marvin</a></td></tr></table></div>');
+			output += ('<img style="-webkit-user-select: none;" src='+imLink+' width="150" height="150" class="left">');
+			output += '<div class="manga-table"><table class="table-bordered table-responsive"><tr><th>plateIFU</th><th>mangaid</th><th>objra</th><th>objdec</th><th>ifura</th><th>ifudec</th></tr>';
+			output += ('<tr><td>'+dict.plateifu+'</td><td>'+dict.mangaid+'</td><td>'+dict.objra+'</td><td>'+dict.objdec+'</td><td>'+dict.ifura+'</td><td>'+dict.ifudec+'</td></tr></table>');
+			output += '<table class="table-bordered table-responsive"><tr><th>drp3qual</th><th>bluesn2</th><th>redsn2</th><th>mjdmax</th><th>mngtarg1</th><th>mngtarg2</th><th>mngtarg3</th></tr>';
+			output += ('<tr><td>'+dict.drp3qual+'</td><td>'+dict.bluesn2+'</td><td>'+dict.redsn2+'</td><td>'+dict.mjdmax+'</td><td>'+dict.mngtarg1+'</td><td>'+dict.mngtarg2+'</td><td>'+dict.mngtarg3+'</td></tr></table></div>');
+			return output;
+		},
+		//Not complete
+		formatSpectra: function(dict) {
 			var output = '<strong>SpecObjID</strong> = ' + dict.specObjID +'<br>';
+			output += ('<div><a href="http://skyserver.sdss.org/dr15/en/get/SpecById.ashx?id='+dict.specObjID+'" target="_blank">View Larger</a></div>');
 			output += ('<img style="-webkit-user-select: none;" src="http://skyserver.sdss.org/dr15/en/get/SpecById.ashx?id='+dict.specObjID+'" width="400" height="400" class="left">');
-			output += ('<div class="spectra-table"><table class="table-bordered table-responsive"><tr><th>Spectrograph</th><td></td></tr><tr><th>class</th><td>'+dict.CLASS+'</td></tr><tr><th>Redshift (z)</th><td>'+dict.z+'</td></tr>');
-			output += ('<tr><th>Redshift error</th><td>'+dict.zErr+'</td></tr><tr><th>Redshift flags</th><td></td></tr><tr><th>survey</th><td>'+dict.survey+'</td></tr><tr><th>programname</th><td>'+dict.programname+'</td></tr><tr><th>primary</th><td></td></tr>');
+			output += ('<div class="spectra-table"><table class="table-bordered table-responsive"><tr><th>Spectrograph</th><td>'+dict.instrument+'</td></tr><tr><th>class</th><td>'+dict.CLASS+'</td></tr><tr><th>Redshift (z)</th><td>'+dict.z+'</td></tr>');
+			output += ('<tr><th>Redshift error</th><td>'+dict.zErr+'</td></tr><tr><th>Redshift flags</th><td>'+dict.WARNING+'</td></tr><tr><th>survey</th><td>'+dict.survey+'</td></tr><tr><th>programname</th><td>'+dict.programname+'</td></tr><tr><th>primary</th><td>'+dict.sciencePrimary+'</td></tr>');
 			output += ('<tr><th>Other spec</th><td></td></tr><tr><th>sourcetype</th><td>'+dict.sourceType+'</td></tr><tr><th>Velocity dispersion (km/s)</th><td>'+dict.velDisp+'</td></tr><tr><th>veldisp_error</th><td>'+dict.velDispErr+'</td></tr>');
-			output += ('<tr><th>targeting_flags</th><td></td></tr><tr><th>plate</th><td>'+dict.plate+'</td></tr><tr><th>mjd</th><td>'+dict.mjd+'</td></tr><tr><th>fiberid</th><td>'+dict.fiberID+'</td></tr></table></div>');
+			output += ('<tr><th>targeting_flags</th><td>'+dict.targetOne+'</td></tr><tr><th>plate</th><td>'+dict.plate+'</td></tr><tr><th>mjd</th><td>'+dict.mjd+'</td></tr><tr><th>fiberid</th><td>'+dict.fiberID+'</td></tr></table></div>');
 			return output;
 		},
 		
-		formatWISE: function(dict, show) {
+		formatWISE: function(dict) {
 			var output = '<table class="table-bordered table-responsive"><tr><th>Catalog</th><th>w1mag</th><th>w2mag</th><th>w3mag</th><th>w4mag</th><th>Full WISE data</th></tr>';
 			output += ('<tr><td>WISE</td><td>'+dict.w1mag+'</td><td>'+dict.w2mag+'</td><td>'+dict.w3mag+'</td><td>'+dict.w4mag+'</td><td><a href="http://skyserver.sdss.org/dr15/en/tools/explore/DisplayResults.aspx?id='+dict.OBJID+'&name=wiseLinkCrossId" target="_blank">Link</a></td></tr></table>');
 			return output;
 		},
 		
-		formatTwoMASS: function(dict, show) {
+		formatTwoMASS: function(dict) {
 			var output = '<table class="table-bordered table-responsive"><tr><th>Catalog</th><th>J</th><th>H</th><th>K_s</th><th>phQual</th></tr>';
 			output += ('<tr><td>TwoMASS</td><td>'+dict.j+'</td><td>'+dict.h+'</td><td>'+dict.k+'</td><td>'+dict.phQual+'</td></tr></table>');
 			return output;
 		},
 		
-		formatRC3: function(dict, show) {
+		formatRC3: function(dict) {
 			var output = '<table class="table-bordered table-responsive"><tr><th>Catalog</th><th>Hubble type</th><th>21 cm magnitude</th><th>Neutral Hydrogen Index</th></tr>';
 			output += ('<tr><td>RC3</td><td>'+dict.HUBBLE+'</td><td>'+dict.M21+' &#177; '+dict.M21ERR+'</td><td>'+dict.HI+'</td></tr></table>');
 			return output;
 		},
 		
-		formatROSAT: function(dict, show) {
+		formatROSAT: function(dict) {
 			var output = '<table class="table-bordered table-responsive"><tr><th>Catalog</th><th>cps</th><th>hr1</th><th>hr2</th><th>ext</th></tr>';
 			output += ('<tr><td>ROSAT</td><td>'+dict.CPS+'</td><td>'+dict.HR1+'</td><td>'+dict.HR2+'</td><td>'+dict.EXT+'</td></tr></table>');
 			return output;
