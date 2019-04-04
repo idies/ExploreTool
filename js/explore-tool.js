@@ -1,4 +1,4 @@
-/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-03-29 */+function ($) {
+/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-04-04 */+function ($) {
   'use strict';
 
   // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
@@ -1508,6 +1508,21 @@
 					explore.displayManga( dict , true);
 				}
 		    }
+		},
+		apogee:{
+			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
+			ContentType:"application/json",
+			type: "POST",
+		    data:{"Query":"","Accept":"application/xml"},
+			success: function (data) {
+				if(data === "\n") {
+					data = "There is no Apogee data available for this object";
+					$("#ex-apogee").html(data);
+				} else {
+					var dict = explore.convertDict(data);
+					explore.displayApogee( dict , true);
+				}
+		    }
 		}
 		},
 			
@@ -1552,6 +1567,10 @@
 			
 			target = explore.targets.manga;
 			target.data.Query = 'select top 1 h.ifura, h.ifudec, h.mangaid, h.mngtarg1, h.mngtarg2, h.mngtarg3,h.objdec, h.objra, h.plateifu, h.mjdmax, h.redsn2, h.drp3qual, h.bluesn2 from mangaDRPall h';
+			$.ajax(target);
+			
+			target = explore.targets.apogee;
+			target.data.Query = 'select top 1 dbo.fApogeeTarget1N(m.apogee_target1) as target1,dbo.fApogeeTarget2N(m.apogee_target2) as target2,m.commiss,p.ra,p.dec,m.glon,m.glat,p.apogee_id,m.apstar_id,p.j,p.j_err,p.h,p.h_err,p.k,p.k_err, p.irac_4_5, p.irac_4_5_err, p.src_4_5 from apogeeObject p, apogeeStar m';
 			$.ajax(target);
 		},
 		
@@ -1644,6 +1663,36 @@
 			var container = $("#ex-manga");
 			var contents = explore.formatManga(dict);
 			$(container).html(contents);
+		},
+		
+		displayApogee: function(dict, show) {
+			var container = $("#ex-apogee");
+			var contents = explore.formatApogee(dict);
+			$(container).html(contents);
+		},
+		
+		formatApogee: function(dict) {
+			var output ='<strong>Targeted star apogee_id</strong>: ' + dict.apogee_id + '<br>';
+			output += '<table class="table-bordered table-responsive"><tr><th>Instrument</th><td>APOGEE</td></tr>';
+			output += ('<tr><th>apstar_id</th><td>'+dict.apstar_id+'</td></tr></table>');
+			output += '<table class="table-bordered table-responsive"><tr>';
+			output += '<th colspan="2">Galactic Coordinates</th><th colspan="2">RA,dec</th></tr>';
+			output += '<tr><th>Longitude (L)</th><th>Latitude (B)</th><th>Decimal</th><th>Sexagesimal</th></tr>';
+			output += '<tr><td>'+dict.glon+'</td><td>'+dict.glat+'</td><td>'+dict.ra+', '+dict.dec+'</td><td>'+explore.raToSexagesimal(parseFloat(dict.ra))+', '+explore.decToSexagesimal(parseFloat(dict.dec))+'</td></tr></table>';
+			var apstar = (dict.apstar_id).split(".");
+			var imLink = '"https://dr15.sdss.org/sas/dr15/'+apstar[0]+'/spectro/redux/r8/stars/'+apstar[1]+'/'+apstar[4]+'/plots/apStar-r8-'+apstar[5].replace("+","%2b")+'.jpg"';
+			output += ('<img style="-webkit-user-select: none;" src='+imLink+'>');
+			output += ('<table class="table-responsive"><tr><td><a href="http://dr15.sdss.org/infrared/spectrum/view/stars?location_id='+apstar[4]+'&commiss='+dict.commiss+'&apogee_id='+dict.apogee_id+'&action=search" target="_blank">Interactive Spectrum</a></td>');
+			output += ('<td><a href="http://dr15.sdss.org/sas/dr15/'+apstar[0]+'/spectro/redux/r8/stars/'+apstar[1]+'/'+apstar[4]+'/apStar-r8-'+apstar[5].replace("+","%2b")+'.fits">Download FITS</a></td></tr></table>');
+			//output += '<img style="-webkit-user-select: none;" src="https://dr15.sdss.org/sas/dr15/apogee/spectro/redux/r8/stars/apo25m/4128/plots/apStar-r8-2M13102744%2b1826172.jpg">';
+			output += '<strong>Targeting Information</strong>';
+			output += '<table class="table-bordered table-responsive"><tr><th>2MASS j</th><th>2MASS h</th><th>2MASS k</th><th>j_err</th><th>h_err</th><th>k_err</th></tr>';
+			output += ('<tr><td>'+dict.j+'</td><td>'+dict.h+'</td><td>'+dict.k+'</td><td>'+dict.j_err+'</td><td>'+dict.h_err+'</td><td>'+dict.k_err+'</td></tr></table>');
+			output += '<table class="table-bordered table-responsive"><tr><th>4.5 micron magnitude</th><th>4.5 micron magnitude error</th><th>4.5 micron magnitude source</th></tr>';
+			output += ('<tr><td>'+dict.irac_4_5+'</td><td>'+dict.irac_4_5_err+'</td><td>'+dict.src_4_5+'</td></tr></table>');
+			output += ('<table class="table-bordered table-responsive"><tr><th>APOGEE target flags 1</th><td>'+dict.target1+'</td></tr>');
+			output += ('<tr><th>APOGEE target flags 2</th><td>'+dict.target2+'</td></tr></table>');
+			return output;
 		},
 		
 		formatManga: function(dict) {
