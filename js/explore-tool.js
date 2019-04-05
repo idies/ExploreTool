@@ -1,4 +1,4 @@
-/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-04-04 */+function ($) {
+/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-04-05 */+function ($) {
   'use strict';
 
   // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
@@ -1570,7 +1570,7 @@
 			$.ajax(target);
 			
 			target = explore.targets.apogee;
-			target.data.Query = 'select top 1 dbo.fApogeeTarget1N(m.apogee_target1) as target1,dbo.fApogeeTarget2N(m.apogee_target2) as target2,m.commiss,p.ra,p.dec,m.glon,m.glat,p.apogee_id,m.apstar_id,p.j,p.j_err,p.h,p.h_err,p.k,p.k_err, p.irac_4_5, p.irac_4_5_err, p.src_4_5 from apogeeObject p, apogeeStar m';
+			target.data.Query = 'select top 1 dbo.fApogeeStarFlagN(m.starflag) as starflag,dbo.fApogeeAspcapFlagN(a.aspcapflag) as ascapflag,a.teff,a.teff_err,a.logg,a.logg_err,a.fe_h,a.fe_h_err,a.alpha_m,a.alpha_m_err,m.vhelio_avg,m.vscatter,dbo.fApogeeTarget1N(m.apogee_target1) as target1,dbo.fApogeeTarget2N(m.apogee_target2) as target2,m.commiss,p.ra,p.dec,m.glon,m.glat,p.apogee_id,m.apstar_id,p.j,p.j_err,p.h,p.h_err,p.k,p.k_err, p.irac_4_5, p.irac_4_5_err, p.src_4_5 from apogeeObject p, apogeeStar m, aspcapStar a';
 			$.ajax(target);
 		},
 		
@@ -1685,13 +1685,21 @@
 			output += ('<table class="table-responsive"><tr><td><a href="http://dr15.sdss.org/infrared/spectrum/view/stars?location_id='+apstar[4]+'&commiss='+dict.commiss+'&apogee_id='+dict.apogee_id+'&action=search" target="_blank">Interactive Spectrum</a></td>');
 			output += ('<td><a href="http://dr15.sdss.org/sas/dr15/'+apstar[0]+'/spectro/redux/r8/stars/'+apstar[1]+'/'+apstar[4]+'/apStar-r8-'+apstar[5].replace("+","%2b")+'.fits">Download FITS</a></td></tr></table>');
 			//output += '<img style="-webkit-user-select: none;" src="https://dr15.sdss.org/sas/dr15/apogee/spectro/redux/r8/stars/apo25m/4128/plots/apStar-r8-2M13102744%2b1826172.jpg">';
-			output += '<strong>Targeting Information</strong>';
+			output += '<h4>Targeting Information</h4>';
 			output += '<table class="table-bordered table-responsive"><tr><th>2MASS j</th><th>2MASS h</th><th>2MASS k</th><th>j_err</th><th>h_err</th><th>k_err</th></tr>';
 			output += ('<tr><td>'+dict.j+'</td><td>'+dict.h+'</td><td>'+dict.k+'</td><td>'+dict.j_err+'</td><td>'+dict.h_err+'</td><td>'+dict.k_err+'</td></tr></table>');
 			output += '<table class="table-bordered table-responsive"><tr><th>4.5 micron magnitude</th><th>4.5 micron magnitude error</th><th>4.5 micron magnitude source</th></tr>';
 			output += ('<tr><td>'+dict.irac_4_5+'</td><td>'+dict.irac_4_5_err+'</td><td>'+dict.src_4_5+'</td></tr></table>');
 			output += ('<table class="table-bordered table-responsive"><tr><th>APOGEE target flags 1</th><td>'+dict.target1+'</td></tr>');
 			output += ('<tr><th>APOGEE target flags 2</th><td>'+dict.target2+'</td></tr></table>');
+			
+			output += '<h4>Stellar Parameters</h4>';
+			output += '<table class="table-bordered table-responsive"><tr><th>Avg v<sub>helio</sub> (km/s)</th><th>Scatter in v<sub>helio</sub> (km/s)</th><th>Best-fit temperature (K)</th><th>Temp error</th></tr>';
+			output += ('<tr><td>'+dict.vhelio_avg+'</td><td>'+dict.vscatter+'</td><td>'+dict.teff+'</td><td>'+dict.teff_err+'</td></tr></table');
+			output += '<table class="table-bordered table-responsive"><tr><th>Surface Gravity log<sub>10</sub>(g)</th><th>log(g) error</th><th>Metallicity [Fe/H]</th><th>Metal error</th><th>[&alpha;/Fe]</th><th>[&alpha;/Fe] error</th></tr>';
+			output += ('<tr><td>'+dict.logg+'</td><td>'+dict.logg_err+'</td><td>'+dict.fe_h+'</td><td>'+dict.fe_h_err+'</td><td>'+dict.alpha_m+'</td><td>'+dict.alpha_m_err+'</td></tr></table>');
+			output += ('<table class="table-bordered table-responsive"><tr><th>Star flags</th><td>'+dict.starflag+'</td></tr>');
+			output += ('<tr><th>Processing flags (ASPCAP)</th><td>'+dict.ascapflag+'</td></tr></table>');
 			return output;
 		},
 		
