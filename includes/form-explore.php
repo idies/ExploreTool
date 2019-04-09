@@ -65,6 +65,13 @@ $result .= '<div class="row">
 							</div>
 						</div>
 					</div>
+					<div class="ex-visits-wrap">
+						<a name="visits" role="button" data-toggle="collapse" href="#ex-visits-outer" aria-expanded="false" aria-controls="ex-visits">Visits</a>
+						<div id="ex-visits-outer" class="ex-visits-outer collapse">
+							<div id="ex-visits" class="ex-visits">
+							</div>
+						</div>
+					</div>
 				</form>
 			</div>
 		</div>

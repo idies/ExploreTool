@@ -166,6 +166,20 @@
 					explore.displayApogee( dict , true);
 				}
 		    }
+		},
+		visits:{
+			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
+			ContentType:"application/json",
+			type: "POST",
+		    data:{"Query":"","Accept":"application/xml"},
+			success: function (data) {
+				if(data === "\n") {
+					data = "There is no Visits data available for this object";
+					$("#ex-visits").html(data);
+				} else {
+					explore.displayVisits( data , true);
+				}
+		    }
 		}
 		},
 			
@@ -209,11 +223,15 @@
 			$.ajax(target);
 			
 			target = explore.targets.manga;
-			target.data.Query = 'select top 1 h.ifura, h.ifudec, h.mangaid, h.mngtarg1, h.mngtarg2, h.mngtarg3,h.objdec, h.objra, h.plateifu, h.mjdmax, h.redsn2, h.drp3qual, h.bluesn2 from mangaDRPall h';
+			target.data.Query = "select h.ifura, h.ifudec, h.mangaid, h.mngtarg1, h.mngtarg2, h.mngtarg3,h.objdec, h.objra, h.plateifu, h.mjdmax, h.redsn2, h.drp3qual, h.bluesn2 from mangaDRPall h where h.mangaid='12-193481'";
 			$.ajax(target);
 			
 			target = explore.targets.apogee;
-			target.data.Query = 'select top 1 dbo.fApogeeStarFlagN(m.starflag) as starflag,dbo.fApogeeAspcapFlagN(a.aspcapflag) as ascapflag,a.teff,a.teff_err,a.logg,a.logg_err,a.fe_h,a.fe_h_err,a.alpha_m,a.alpha_m_err,m.vhelio_avg,m.vscatter,dbo.fApogeeTarget1N(m.apogee_target1) as target1,dbo.fApogeeTarget2N(m.apogee_target2) as target2,m.commiss,p.ra,p.dec,m.glon,m.glat,p.apogee_id,m.apstar_id,p.j,p.j_err,p.h,p.h_err,p.k,p.k_err, p.irac_4_5, p.irac_4_5_err, p.src_4_5 from apogeeObject p, apogeeStar m, aspcapStar a';
+			target.data.Query = "select dbo.fApogeeStarFlagN(m.starflag) as starflag,dbo.fApogeeAspcapFlagN(a.aspcapflag) as ascapflag,a.teff,a.teff_err,a.logg,a.logg_err,a.fe_h,a.fe_h_err,a.alpha_m,a.alpha_m_err,m.vhelio_avg,m.vscatter,dbo.fApogeeTarget1N(m.apogee_target1) as target1,dbo.fApogeeTarget2N(m.apogee_target2) as target2,m.commiss,p.ra,p.dec,m.glon,m.glat,p.apogee_id,m.apstar_id,p.j,p.j_err,p.h,p.h_err,p.k,p.k_err, p.irac_4_5, p.irac_4_5_err, p.src_4_5 from apogeeObject p, apogeeStar m, aspcapStar a where p.apogee_id='2M13102744+1826172' and a.apogee_id='2M13102744+1826172' and m.apogee_id='2M13102744+1826172'";
+			$.ajax(target);
+			
+			target = explore.targets.visits;
+			target.data.Query = "select visit_id, plate, mjd, fiberid, dbo.fMjdToGMT(mjd) as string, vrel from apogeeVisit where apogee_id='2M13102744+1826172' order by mjd";
 			$.ajax(target);
 		},
 		
@@ -312,6 +330,17 @@
 			var container = $("#ex-apogee");
 			var contents = explore.formatApogee(dict);
 			$(container).html(contents);
+		},
+		
+		displayVisits: function(input, show) {
+			var container = $("#ex-visits");
+			var contents = explore.formatVisits(input);
+			$(container).html(contents);
+		},
+		
+		formatVisits: function(input) {
+			var output = "Not yet implemented";
+			return output;
 		},
 		
 		formatApogee: function(dict) {
