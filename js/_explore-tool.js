@@ -27,9 +27,13 @@
 		    type: "POST",
 		    data:{"Query":"","Accept":"application/xml"},
 		    success: function (data) {
-				var dict = explore.convertDict(data);
-				explore.displayData( dict , true);
-				explore.toBin(dict);
+				if(data === "\n") {
+					$("ex-data").html(data);
+				} else {
+					var dict = explore.convertDict(data);
+					explore.displayData( dict , true);
+					explore.toBin(dict);
+				}
 		    }
 		},
 		USNO:{
@@ -223,15 +227,16 @@
 			$.ajax(target);
 			
 			target = explore.targets.manga;
-			target.data.Query = "select h.ifura, h.ifudec, h.mangaid, h.mngtarg1, h.mngtarg2, h.mngtarg3,h.objdec, h.objra, h.plateifu, h.mjdmax, h.redsn2, h.drp3qual, h.bluesn2 from mangaDRPall h where h.mangaid='12-193481'";
+			//target.data.Query = "select h.ifura, h.ifudec, h.mangaid, h.mngtarg1, h.mngtarg2, h.mngtarg3,h.objdec, h.objra, h.plateifu, h.mjdmax, h.redsn2, h.drp3qual, h.bluesn2 from mangaDRPall h where h.mangaid='12-193481'";
+			target.data.Query = "select top 1 * from dbo.fGetNearbyMangaObjEq(229.525575753922,42.7458537608544,0.5)";
 			$.ajax(target);
 			
 			target = explore.targets.apogee;
-			target.data.Query = "select dbo.fApogeeStarFlagN(m.starflag) as starflag,dbo.fApogeeAspcapFlagN(a.aspcapflag) as ascapflag,a.teff,a.teff_err,a.logg,a.logg_err,a.fe_h,a.fe_h_err,a.alpha_m,a.alpha_m_err,m.vhelio_avg,m.vscatter,dbo.fApogeeTarget1N(m.apogee_target1) as target1,dbo.fApogeeTarget2N(m.apogee_target2) as target2,m.commiss,p.ra,p.dec,m.glon,m.glat,p.apogee_id,m.apstar_id,p.j,p.j_err,p.h,p.h_err,p.k,p.k_err, p.irac_4_5, p.irac_4_5_err, p.src_4_5 from apogeeObject p, apogeeStar m, aspcapStar a where p.apogee_id='2M13102744+1826172' and a.apogee_id='2M13102744+1826172' and m.apogee_id='2M13102744+1826172'";
+			target.data.Query = "select b.apogee_id, dbo.fApogeeStarFlagN(m.starflag) as starflag,dbo.fApogeeAspcapFlagN(a.aspcapflag) as ascapflag,a.teff,a.teff_err,a.logg,a.logg_err,a.fe_h,a.fe_h_err,a.alpha_m,a.alpha_m_err,m.vhelio_avg,m.vscatter,dbo.fApogeeTarget1N(m.apogee_target1) as target1,dbo.fApogeeTarget2N(m.apogee_target2) as target2,m.commiss,p.ra,p.dec,m.glon,m.glat,p.apogee_id,m.apstar_id,p.j,p.j_err,p.h,p.h_err,p.k,p.k_err, p.irac_4_5, p.irac_4_5_err, p.src_4_5 from apogeeObject p, apogeeStar m, aspcapStar a, dbo.fGetNearbyApogeeStarEq(229.525575753922,42.7458537608544,0.5) b where p.apogee_id=b.apogee_id and a.apogee_id=b.apogee_id and m.apogee_id=b.apogee_id";
 			$.ajax(target);
 			
 			target = explore.targets.visits;
-			target.data.Query = "select visit_id, plate, mjd, fiberid, dbo.fMjdToGMT(mjd) as string, vrel from apogeeVisit where apogee_id='2M13102744+1826172' order by mjd";
+			target.data.Query = "select a.visit_id, a.plate, a.mjd, a.fiberid, dbo.fMjdToGMT(a.mjd) as string, a.vrel, b.apogee_id from apogeeVisit a, dbo.fGetNearbyApogeeStarEq(229.525575753922,42.7458537608544,0.5) b where a.apogee_id=b.apogee_id order by mjd";
 			$.ajax(target);
 		},
 		
@@ -339,7 +344,28 @@
 		},
 		
 		formatVisits: function(input) {
-			var output = "Not yet implemented";
+			var output = '<table class="table-bordered table-responsive"><tr><th>visit_id</th><th>plate</th><th>mjd</th><th>fiberid</th><th>date</th><th>time (UTC)</th><th>vrel</th></tr>';
+			var body = input.substring(input.indexOf('"'));
+			var lines = body.split('\n');
+			for(var i = 0; i < lines.length - 1; i++) {
+				output += '<tr>';
+				var line = lines[i].split(',');
+				for(var x = 0; x < line.length - 1; x++) {
+					line[x] = line[x].replace('"', '');
+					line[x] = line[x].replace('"', '');
+					output += '<td>';
+					if(x !== 4) {
+						output += line[x];
+					} else {
+						var temp = line[x].split(' ');
+						output += (temp[0] + '</td><td>');
+						output += temp[1];
+					}
+					output += '</td>';
+				}
+				output += '</tr>';
+			}
+			output += '</table>';
 			return output;
 		},
 		
@@ -376,7 +402,7 @@
 		},
 		
 		formatManga: function(dict) {
-			var PlateIFU = (dict.plateifu).split("-");
+			var PlateIFU = (dict.plateIFU).split("-");
 			var imLink = '"https://dr15.sdss.org/sas/dr15/manga/spectro/redux/v2_4_3/'+PlateIFU[0]+'/stack/images/'+PlateIFU[1]+'.png"';
 			var LINLink = '"http://data.sdss.org/sas/dr15/manga/spectro/redux/v2_4_3/'+PlateIFU[0]+'/stack/manga-'+dict.plateifu+'-LINCUBE.fits.gz"';
 			var LOGLink = '"http://data.sdss.org/sas/dr15/manga/spectro/redux/v2_4_3/'+PlateIFU[0]+'/stack/manga-'+dict.plateifu+'-LOGCUBE.fits.gz"';
@@ -387,7 +413,7 @@
 			output += ('<td><a href='+ExpLink+' target="_blank">Explore in Marvin</a></td></tr></table></div>');
 			output += ('<img style="-webkit-user-select: none;" src='+imLink+' width="150" height="150" class="left">');
 			output += '<div class="manga-table"><table class="table-bordered table-responsive"><tr><th>plateIFU</th><th>mangaid</th><th>objra</th><th>objdec</th><th>ifura</th><th>ifudec</th></tr>';
-			output += ('<tr><td>'+dict.plateifu+'</td><td>'+dict.mangaid+'</td><td>'+dict.objra+'</td><td>'+dict.objdec+'</td><td>'+dict.ifura+'</td><td>'+dict.ifudec+'</td></tr></table>');
+			output += ('<tr><td>'+dict.plateIFU+'</td><td>'+dict.mangaid+'</td><td>'+dict.objra+'</td><td>'+dict.objdec+'</td><td>'+dict.ifura+'</td><td>'+dict.ifudec+'</td></tr></table>');
 			output += '<table class="table-bordered table-responsive"><tr><th>drp3qual</th><th>bluesn2</th><th>redsn2</th><th>mjdmax</th><th>mngtarg1</th><th>mngtarg2</th><th>mngtarg3</th></tr>';
 			output += ('<tr><td>'+dict.drp3qual+'</td><td>'+dict.bluesn2+'</td><td>'+dict.redsn2+'</td><td>'+dict.mjdmax+'</td><td>'+dict.mngtarg1+'</td><td>'+dict.mngtarg2+'</td><td>'+dict.mngtarg3+'</td></tr></table></div>');
 			return output;
