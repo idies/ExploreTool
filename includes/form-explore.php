@@ -15,13 +15,13 @@ $result .= '<div class="row">
 						<a name="search" role="button" data-toggle="collapse" href="#ex-search-outer" aria-expanded="false" aria-controls="ex-search">Search</a>
 						<div id="ex-search-outer" class="ex-search-outer collapse">
 							<div id="ex-search" class="ex-search">
-								Name: <input type="text" id="Name" value="ACO  2255"><button id="Name_button">Find</button><br>
-								SpecObjID, apstar_id or apogee_id: <input type="text" id="SpecObjID" value="2947691243863304192"><button id="SpecObjID_button">Go</button><br>
-								Ra/Dec: <input type="text" id="Ra" value="197.614455635">/<input type="text" id="Dec" value="18.438168849"><button id="Ra_Dec_button">Go</button><br>
-								5-part SDSS: <input type="text" id="SDSS" value="5314-301-1-136-96"><button id="SDSS_button">Go</button><br>
-								ObjID: <input type="text" id="ObjID" value="1237668296598749280"><button id="ObjID_button">Go</button><br>
-								Plate-MJD-Fiber: <input type="text" id="Plate" value="2618">-<input type="text" id="MJD" value="54506">-<input type="text" id="Fiber" value="310"><button id="plate_mjd_fiber_button">Go</button><br>
-								MangaID: <input type="text" id="MangaID" value="12-193481"><button id="mangaID_button">Go</button>
+								Name: <input type="text" id="Name" value="ACO  2255"><button id="Name_button" type="button">Find</button><br>
+								SpecObjID, apstar_id or apogee_id: <input type="text" id="SpecObjID" value="2947691243863304192"><button id="SpecObjID_button" type="button">Go</button><br>
+								Ra/Dec: <input type="text" id="Ra" value="197.614455635">/<input type="text" id="Dec" value="18.438168849"><button id="Ra_Dec_button" type="button">Go</button><br>
+								5-part SDSS: <input type="text" id="SDSS" value="5314-301-1-136-96"><button id="SDSS_button" type="button">Go</button><br>
+								ObjID: <input type="text" id="ObjID" value="1237668296598749280"><button id="ObjID_button" type="button">Go</button><br>
+								Plate-MJD-Fiber: <input type="text" id="Plate" value="2618">-<input type="text" id="MJD" value="54506">-<input type="text" id="Fiber" value="310"><button id="plate_mjd_fiber_button" type="button">Go</button><br>
+								MangaID: <input type="text" id="MangaID" value="12-193481"><button id="mangaID_button" type="button">Go</button>
 							</div>
 						</div>
 					</div>
