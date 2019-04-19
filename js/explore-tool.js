@@ -1,4 +1,4 @@
-/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-04-12 */+function ($) {
+/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-04-19 */+function ($) {
   'use strict';
 
   // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
@@ -1564,19 +1564,68 @@
 				}
 				explore.doSearch();
 		    }
+		},
+		objFromRaDec:{
+			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
+			ContentType:"application/json",
+			type: "POST",
+		    data:{"Query":"","Accept":"application/xml"},
+			success: function (data) {
+				if(data === "\n") {
+					explore.attributes.objID = "";
+				} else {
+					var dict = explore.convertDict(data);
+					explore.attributes.objID = dict.objID;
+				}
+				explore.doSearch();
+		    }
+		},
+		objFromSpec:{
+			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
+			ContentType:"application/json",
+			type: "POST",
+		    data:{"Query":"","Accept":"application/xml"},
+			success: function (data) {
+				if(data === "\n") {
+					explore.attributes.objID = "";
+				} else {
+					var dict = explore.convertDict(data);
+					explore.attributes.objID = dict.objID;
+				}
+				var target = explore.targets.radecFromObj;
+				target.data.Query = "select ra,dec from PhotoObjAll where objID=" + explore.attributes.objID;
+				$.ajax(target);
+		    }
+		},
+		objFromApogee:{
+			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
+			ContentType:"application/json",
+			type: "POST",
+		    data:{"Query":"","Accept":"application/xml"},
+			success: function (data) {
+				if(data === "\n") {
+					explore.attributes.objID = "";
+				} else {
+					var dict = explore.convertDict(data);
+					explore.attributes.objID = dict.objID;
+				}
+				var target = explore.targets.radecFromObj;
+				target.data.Query = "select ra,dec from PhotoObjAll where objID=" + explore.attributes.objID;
+				$.ajax(target);
+		    }
 		}
 		},
 			
 		init: function(){
 			this.doSearch();
 			this.showForm( explore.context , false , true );
-			$("#Name_button", explore.context).on('click', explore.nameSearch);
-			$("#SpecObjID_button", explore.context).on('click', explore.specObjSearch);
-			$("#Ra_Dec_button", explore.context).on('click', explore.ra_decSearch);
-			$("#SDSS_button", explore.context).on('click', explore.sdssSearch);
-			$('#ObjID_button', explore.context).on('click', explore.objSearch);
-			$("#plate_mjd_fiber_button", explore.context).on('click', explore.plateSearch);
-			$("#mangaID_button", explore.context).on('click', explore.mangaSearch);
+			$(document).on('click', "#Name_button", explore.nameSearch);
+			$(document).on('click', "#SpecObjID_button", explore.specObjSearch);
+			$(document).on('click', "#Ra_Dec_button", explore.ra_decSearch);
+			$(document).on('click', "#SDSS_button", explore.sdssSearch);
+			$(document).on("click", "#ObjID_button", explore.objSearch);
+			$(document).on('click', "#plate_mjd_fiber_button", explore.plateSearch);
+			$(document).on('click', "#mangaID_button", explore.mangaSearch);
 		},
 		
 		nameSearch: function(e) {
@@ -1584,11 +1633,30 @@
 		},
 		
 		specObjSearch: function(e) {
-			
+			var value = $("#SpecObjID").attr('value');
+			var target;
+			if(value.includes(".")) {
+				target = explore.targets.objFromApogee;
+				target.data.Query = "select top 1 ra,dec,dbo.fGetNearestObjIdAllEq(ra,dec,0.5) as objID from apogeeStar where apstar_id='" + value + "'";
+				$.ajax(target);
+			} else if(value.includes("+")) {
+				target = explore.targets.objFromApogee;
+				target.data.Query = "select top 1 ra,dec,dbo.fGetNearestObjIdAllEq(ra,dec,0.5) as objID from apogeeStar where apogee_id='" + value + "'";
+				$.ajax(target);
+				
+			} else {
+				target = explore.targets.objFromSpec;
+				target.data.Query = "select bestObjID as objID from SpecObjAll where specObjID=" + value;
+				$.ajax(target);
+			}
 		},
 		
 		ra_decSearch: function(e) {
-			
+			explore.attributes.ra = $("#Ra").attr('value');
+			explore.attributes.dec = $("#Dec").attr('value');
+			var target = explore.targets.objFromRaDec;
+			target.data.Query = "select top 1 dbo.fGetNearestObjIdAllEq("+explore.attributes.ra+","+explore.attributes.dec+",0.5) as objID";
+			$.ajax(target);
 		},
 		
 		sdssSearch: function(e) {
@@ -1596,11 +1664,9 @@
 		},
 		
 		objSearch: function(e) {
-			console.log("here");
-			explore.attributes.objID = e.currentTarget.value;
-			console.log(explore.attributes.objID);
+			explore.attributes.objID = $("#ObjID").attr('value');
 			var target = explore.targets.radecFromObj;
-			target.data.Query = "select ra,dec from PhotoObj where objID=" + explore.attributes.objID;
+			target.data.Query = "select ra,dec from PhotoObjAll where objID=" + explore.attributes.objID;
 			$.ajax(target);
 			
 		},
@@ -1610,12 +1676,15 @@
 		},
 		
 		mangaSearch: function(e) {
-			
+			var manga = $("#MangaID").attr('value');
+			var target = explore.targets.objFromApogee;
+			target.data.Query = "select top 1 objra,objdec,dbo.fGetNearestObjIdAllEq(objra,objdec,0.5) as objID from mangaDAPall where mangaid='" + manga + "'";
+			$.ajax(target);
 		},
 		
 		doSearch: function() {
 			var target = explore.targets.data;
-			target.data.Query = "SELECT dbo.fPhotoTypeN(p.type) AS Type, p.ra, p.dec, p.run, p.rerun, p.camcol, p.field, p.obj, p.specObjID, p.objID, p.l, p.b, p.type, p.u, p.g, p.r, p.i, p.z AS pz, p.err_u, p.err_g, p.err_r, p.err_i, p.err_z, p.flags, p.mjd AS ImageMJD, dbo.fMjdToGMT(p.mjd) AS ImageMJDString, dbo.fPhotoModeN(p.mode) AS Mode, p.parentID, p.nChild, p.extinction_r, p.petroRad_r, p.petroRadErr_r, Photoz.z AS Photoz, Photoz.zerr AS Photoz_err, zooSpec.spiral AS Zoo1Morphology_spiral, zooSpec.elliptical AS Zoo1Morphology_elliptical, zooSpec.uncertain AS Zoo1Morphology_uncertain, s.instrument, s.class, s.z, s.zErr, s.survey, s.programname, s.sourcetype, s.velDisp, s.velDispErr, s.plate, s.mjd AS specMJD, s.fiberID FROM PhotoObj AS p LEFT JOIN Photoz ON Photoz.objID = p.objID LEFT JOIN zooSpec ON zooSpec.objID = p.objID LEFT JOIN SpecObj AS s ON s.specObjID = p.specObjID WHERE p.objID=" + explore.attributes.objID;
+			target.data.Query = "SELECT dbo.fPhotoTypeN(p.type) AS Type, p.ra, p.dec, p.run, p.rerun, p.camcol, p.field, p.obj, p.specObjID, p.objID, p.l, p.b, p.type, p.u, p.g, p.r, p.i, p.z AS pz, p.err_u, p.err_g, p.err_r, p.err_i, p.err_z, p.flags, p.mjd AS ImageMJD, dbo.fMjdToGMT(p.mjd) AS ImageMJDString, dbo.fPhotoModeN(p.mode) AS Mode, p.parentID, p.nChild, p.extinction_r, p.petroRad_r, p.petroRadErr_r, Photoz.z AS Photoz, Photoz.zerr AS Photoz_err, zooSpec.spiral AS Zoo1Morphology_spiral, zooSpec.elliptical AS Zoo1Morphology_elliptical, zooSpec.uncertain AS Zoo1Morphology_uncertain, s.instrument, s.class, s.z, s.zErr, s.survey, s.programname, s.sourcetype, s.velDisp, s.velDispErr, s.plate, s.mjd AS specMJD, s.fiberID FROM PhotoObjAll AS p LEFT JOIN Photoz ON Photoz.objID = p.objID LEFT JOIN zooSpec ON zooSpec.objID = p.objID LEFT JOIN SpecObjAll AS s ON s.specObjID = p.specObjID WHERE p.objID=" + explore.attributes.objID;
 			$.ajax(target);
 			
 			target = explore.targets.USNO;
@@ -1649,15 +1718,15 @@
 			
 			target = explore.targets.manga;
 			//target.data.Query = "select h.ifura, h.ifudec, h.mangaid, h.mngtarg1, h.mngtarg2, h.mngtarg3,h.objdec, h.objra, h.plateifu, h.mjdmax, h.redsn2, h.drp3qual, h.bluesn2 from mangaDRPall h where h.mangaid='12-193481'";
-			target.data.Query = "select top 1 * from dbo.fGetNearbyMangaObjEq(" + explore.attributes.ra + "," + explore.attributes.dec + ",0.5)";
+			target.data.Query = "select * from dbo.fGetNearestMangaObjEq(" + explore.attributes.ra + "," + explore.attributes.dec + ",0.5)";
 			$.ajax(target);
 			
 			target = explore.targets.apogee;
-			target.data.Query = "select b.apogee_id, dbo.fApogeeStarFlagN(m.starflag) as starflag,dbo.fApogeeAspcapFlagN(a.aspcapflag) as ascapflag,a.teff,a.teff_err,a.logg,a.logg_err,a.fe_h,a.fe_h_err,a.alpha_m,a.alpha_m_err,m.vhelio_avg,m.vscatter,dbo.fApogeeTarget1N(m.apogee_target1) as target1,dbo.fApogeeTarget2N(m.apogee_target2) as target2,m.commiss,p.ra,p.dec,m.glon,m.glat,p.apogee_id,m.apstar_id,p.j,p.j_err,p.h,p.h_err,p.k,p.k_err, p.irac_4_5, p.irac_4_5_err, p.src_4_5 from apogeeObject p, apogeeStar m, aspcapStar a, dbo.fGetNearbyApogeeStarEq(" + explore.attributes.ra + "," + explore.attributes.dec + ",0.5) b where p.apogee_id=b.apogee_id and a.apogee_id=b.apogee_id and m.apogee_id=b.apogee_id";
+			target.data.Query = "select b.apogee_id, dbo.fApogeeStarFlagN(m.starflag) as starflag,dbo.fApogeeAspcapFlagN(a.aspcapflag) as ascapflag,a.teff,a.teff_err,a.logg,a.logg_err,a.fe_h,a.fe_h_err,a.alpha_m,a.alpha_m_err,m.vhelio_avg,m.vscatter,dbo.fApogeeTarget1N(m.apogee_target1) as target1,dbo.fApogeeTarget2N(m.apogee_target2) as target2,m.commiss,p.ra,p.dec,m.glon,m.glat,p.apogee_id,m.apstar_id,p.j,p.j_err,p.h,p.h_err,p.k,p.k_err, p.irac_4_5, p.irac_4_5_err, p.src_4_5 from apogeeObject p, apogeeStar m, aspcapStar a, dbo.fGetNearestApogeeStarEq(" + explore.attributes.ra + "," + explore.attributes.dec + ",0.5) b where p.apogee_id=b.apogee_id and a.apogee_id=b.apogee_id and m.apogee_id=b.apogee_id";
 			$.ajax(target);
 			
 			target = explore.targets.visits;
-			target.data.Query = "select a.visit_id, a.plate, a.mjd, a.fiberid, dbo.fMjdToGMT(a.mjd) as string, a.vrel, b.apogee_id from apogeeVisit a, dbo.fGetNearbyApogeeStarEq(" + explore.attributes.ra + "," + explore.attributes.dec + ",0.5) b where a.apogee_id=b.apogee_id order by mjd";
+			target.data.Query = "select a.visit_id, a.plate, a.mjd, a.fiberid, dbo.fMjdToGMT(a.mjd) as string, a.vrel, b.apogee_id from apogeeVisit a, dbo.fGetNearestApogeeStarEq(" + explore.attributes.ra + "," + explore.attributes.dec + ",0.5) b where a.apogee_id=b.apogee_id order by mjd";
 			$.ajax(target);
 		},
 		
@@ -1689,7 +1758,6 @@
 		 * @param Boolean $append Append or replace current message(s)
 		**/
 		displayData: function( dict , show) {
-			console.log(dict.flags);
 			var container = $("#ex-data");
 			var contents = explore.formatLineOne(dict);
 			contents += ('<br>' + explore.formatLineTwo(dict));
