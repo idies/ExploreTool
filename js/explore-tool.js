@@ -1,4 +1,4 @@
-/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-04-19 */+function ($) {
+/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-04-25 */+function ($) {
   'use strict';
 
   // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
@@ -1580,7 +1580,7 @@
 				explore.doSearch();
 		    }
 		},
-		objFromSpec:{
+		objFromOther:{
 			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
 			ContentType:"application/json",
 			type: "POST",
@@ -1597,20 +1597,19 @@
 				$.ajax(target);
 		    }
 		},
-		objFromApogee:{
-			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
-			ContentType:"application/json",
-			type: "POST",
-		    data:{"Query":"","Accept":"application/xml"},
+		radecFromName:{
+			url:"",
+			type: "GET",
 			success: function (data) {
 				if(data === "\n") {
-					explore.attributes.objID = "";
+					explore.attributes.ra = "";
+					explore.attributes.dec = "";
 				} else {
-					var dict = explore.convertDict(data);
-					explore.attributes.objID = dict.objID;
+					explore.attributes.ra = data.data[0][0].toString();
+					explore.attributes.dec = data.data[0][1].toString();
 				}
-				var target = explore.targets.radecFromObj;
-				target.data.Query = "select ra,dec from PhotoObjAll where objID=" + explore.attributes.objID;
+				var target = explore.targets.objFromRaDec;
+				target.data.Query = "select top 1 dbo.fGetNearestObjIdAllEq("+explore.attributes.ra+","+explore.attributes.dec+",0.5) as objID";
 				$.ajax(target);
 		    }
 		}
@@ -1629,23 +1628,26 @@
 		},
 		
 		nameSearch: function(e) {
-			
+			var value = $("#Name").attr('value');
+			var target = explore.targets.radecFromName;
+			target.url = "//simbad.u-strasbg.fr/simbad/sim-tap/sync?request=doQuery&lang=adql&format=json&query=SELECT%20a.ra,a.dec%20from%20basic%20as%20a,IDENT%20as%20b%20where%20a.oid=b.oidref%20and%20b.id=%27" + value + "%27";
+			$.ajax(target);
 		},
 		
 		specObjSearch: function(e) {
 			var value = $("#SpecObjID").attr('value');
 			var target;
 			if(value.includes(".")) {
-				target = explore.targets.objFromApogee;
+				target = explore.targets.objFromOther;
 				target.data.Query = "select top 1 ra,dec,dbo.fGetNearestObjIdAllEq(ra,dec,0.5) as objID from apogeeStar where apstar_id='" + value + "'";
 				$.ajax(target);
 			} else if(value.includes("+")) {
-				target = explore.targets.objFromApogee;
+				target = explore.targets.objFromOther;
 				target.data.Query = "select top 1 ra,dec,dbo.fGetNearestObjIdAllEq(ra,dec,0.5) as objID from apogeeStar where apogee_id='" + value + "'";
 				$.ajax(target);
 				
 			} else {
-				target = explore.targets.objFromSpec;
+				target = explore.targets.objFromOther;
 				target.data.Query = "select bestObjID as objID from SpecObjAll where specObjID=" + value;
 				$.ajax(target);
 			}
@@ -1660,7 +1662,10 @@
 		},
 		
 		sdssSearch: function(e) {
-			
+			var values = ($("#SDSS").attr('value')).split("-");
+			var target = explore.targets.objFromOther;
+			target.data.Query = "select top 1 objID from PhotoObjAll where run="+values[0]+" and rerun="+values[1]+" and camcol="+values[2]+" and field="+values[3]+" and obj="+values[4];
+			$.ajax(target);
 		},
 		
 		objSearch: function(e) {
@@ -1672,12 +1677,17 @@
 		},
 		
 		plateSearch: function(e) {
-			
+			var plate_val = $("#Plate").attr('value');
+			var mjd_val = $("#MJD").attr('value');
+			var fiber_val = $("#Fiber").attr('value');
+			var target = explore.targets.objFromOther;
+			target.data.Query = "select a.objID from photoObjAll a,SpecObjAll b where a.objID=b.bestObjID and b.plate="+plate_val+" and b.mjd="+mjd_val+" and b.fiberID="+fiber_val;
+			$.ajax(target);
 		},
 		
 		mangaSearch: function(e) {
 			var manga = $("#MangaID").attr('value');
-			var target = explore.targets.objFromApogee;
+			var target = explore.targets.objFromOther;
 			target.data.Query = "select top 1 objra,objdec,dbo.fGetNearestObjIdAllEq(objra,objdec,0.5) as objID from mangaDAPall where mangaid='" + manga + "'";
 			$.ajax(target);
 		},
@@ -1893,9 +1903,9 @@
 		formatManga: function(dict) {
 			var PlateIFU = (dict.plateIFU).split("-");
 			var imLink = '"https://dr15.sdss.org/sas/dr15/manga/spectro/redux/v2_4_3/'+PlateIFU[0]+'/stack/images/'+PlateIFU[1]+'.png"';
-			var LINLink = '"http://data.sdss.org/sas/dr15/manga/spectro/redux/v2_4_3/'+PlateIFU[0]+'/stack/manga-'+dict.plateifu+'-LINCUBE.fits.gz"';
-			var LOGLink = '"http://data.sdss.org/sas/dr15/manga/spectro/redux/v2_4_3/'+PlateIFU[0]+'/stack/manga-'+dict.plateifu+'-LOGCUBE.fits.gz"';
-			var ExpLink = '"http://sas.sdss.org/marvin/galaxy/'+dict.plateifu+'"';
+			var LINLink = '"http://data.sdss.org/sas/dr15/manga/spectro/redux/v2_4_3/'+PlateIFU[0]+'/stack/manga-'+dict.plateIFU+'-LINCUBE.fits.gz"';
+			var LOGLink = '"http://data.sdss.org/sas/dr15/manga/spectro/redux/v2_4_3/'+PlateIFU[0]+'/stack/manga-'+dict.plateIFU+'-LOGCUBE.fits.gz"';
+			var ExpLink = '"http://sas.sdss.org/marvin/galaxy/'+dict.plateIFU+'"';
 			var output = '<div><table class="table-responsive"><tr><td><a href='+imLink+' target="_blank">View Larger</a></td>';
 			output += ('<td><a href='+LINLink+'>LIN Data Cube</a></td>');
 			output += ('<td><a href='+LOGLink+'>LOG Data Cube</a></td>');
