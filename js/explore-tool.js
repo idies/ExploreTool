@@ -1,4 +1,4 @@
-/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-04-25 */+function ($) {
+/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-04-26 */+function ($) {
   'use strict';
 
   // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
@@ -1382,6 +1382,23 @@
 			dec: "42.7458537608544"
 		},
 		
+		specData: {},
+		
+		queriesFinished: {
+			data: true,
+			imaging: true,
+			USNO: true,
+			FIRST: true,
+			ROSAT: true,
+			RC3: true,
+			TwoMASS: true,
+			WISE: true,
+			spectra: true,
+			manga: true,
+			apogee: true,
+			visits: true
+		},
+		
 		targets: {
 		data:{
 			//put back in https:
@@ -1392,6 +1409,9 @@
 		    success: function (data) {
 				if(data === "\n") {
 					$("ex-data").html(data);
+					explore.queriesFinished.data = true;
+					explore.queriesFinished.imaging = true;
+					explore.updateHour();
 				} else {
 					var dict = explore.convertDict(data);
 					explore.displayData( dict , true);
@@ -1408,6 +1428,8 @@
 				if(data === "\n") {
 					data = "There is no USNO data available for this object";
 					$("#ex-cross-USNO").html(data);
+					explore.queriesFinished.USNO = true;
+					explore.updateHour();
 				} else {
 					var dict = explore.convertDict(data);
 					explore.displayUSNO( dict , true);
@@ -1423,6 +1445,8 @@
 				if(data === "\n") {
 					data = "There is no FIRST data available for this object";
 					$("#ex-cross-FIRST").html(data);
+					explore.queriesFinished.FIRST = true;
+					explore.updateHour();
 				} else {
 					var dict = explore.convertDict(data);
 					explore.displayFIRST( dict , true);
@@ -1438,6 +1462,8 @@
 				if(data === "\n") {
 					data = "There is no ROSAT data available for this object";
 					$("#ex-cross-ROSAT").html(data);
+					explore.queriesFinished.ROSAT = true;
+					explore.updateHour();
 				} else {
 					var dict = explore.convertDict(data);
 					explore.displayROSAT( dict , true);
@@ -1453,6 +1479,8 @@
 				if(data === "\n") {
 					data = "There is no RC3 data available for this object";
 					$("#ex-cross-RC3").html(data);
+					explore.queriesFinished.RC3 = true;
+					explore.updateHour();
 				} else {
 					var dict = explore.convertDict(data);
 					explore.displayRC3( dict , true);
@@ -1468,6 +1496,8 @@
 				if(data === "\n") {
 					data = "There is no TwoMASS data available for this object";
 					$("#ex-cross-TwoMASS").html(data);
+					explore.queriesFinished.TwoMASS = true;
+					explore.updateHour();
 				} else {
 					var dict = explore.convertDict(data);
 					explore.displayTwoMASS( dict , true);
@@ -1483,6 +1513,8 @@
 				if(data === "\n") {
 					data = "There is no WISE data available for this object";
 					$("#ex-cross-WISE").html(data);
+					explore.queriesFinished.WISE = true;
+					explore.updateHour();
 				} else {
 					var dict = explore.convertDict(data);
 					explore.displayWISE( dict , true);
@@ -1498,9 +1530,29 @@
 				if(data === "\n") {
 					data = "There is no Optical Spectra data available for this object";
 					$("#ex-spectra").html(data);
+					explore.queriesFinished.spectra = true;
+					explore.updateHour();
 				} else {
-					var dict = explore.convertDict(data);
-					explore.displaySpectra( dict , true);
+					explore.specData = explore.convertDict(data);
+					var target = explore.targets.spectraCount;
+					target.data.Query = "select count(SpecObjID) as count from SpecObjAll where bestObjID="+explore.specData.bestObjID;
+					$.ajax(target);
+				}
+		    }
+		},
+		spectraCount:{
+			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
+			ContentType:"application/json",
+			type: "POST",
+		    data:{"Query":"","Accept":"application/xml"},
+			success: function (data) {
+				if(data === "\n") {
+					data = "There is no Optical Spectra data available for this object";
+					$("#ex-spectra").html(data);
+					explore.queriesFinished.spectra = true;
+					explore.updateHour();
+				} else {
+					explore.displaySpectra( explore.specData , explore.convertDict(data), true);
 				}
 		    }
 		},
@@ -1513,6 +1565,8 @@
 				if(data === "\n") {
 					data = "There is no MaNGA data available for this object";
 					$("#ex-manga").html(data);
+					explore.queriesFinished.manga = true;
+					explore.updateHour();
 				} else {
 					var dict = explore.convertDict(data);
 					explore.displayManga( dict , true);
@@ -1528,6 +1582,8 @@
 				if(data === "\n") {
 					data = "There is no Apogee data available for this object";
 					$("#ex-apogee").html(data);
+					explore.queriesFinished.apogee = true;
+					explore.updateHour();
 				} else {
 					var dict = explore.convertDict(data);
 					explore.displayApogee( dict , true);
@@ -1543,6 +1599,8 @@
 				if(data === "\n") {
 					data = "There is no Visits data available for this object";
 					$("#ex-visits").html(data);
+					explore.queriesFinished.visits = true;
+					explore.updateHour();
 				} else {
 					explore.displayVisits( data , true);
 				}
@@ -1693,6 +1751,19 @@
 		},
 		
 		doSearch: function() {
+			explore.queriesFinished.data = false;
+			explore.queriesFinished.imaging = false;
+			explore.queriesFinished.USNO = false;
+			explore.queriesFinished.FIRST = false;
+			explore.queriesFinished.ROSAT = false;
+			explore.queriesFinished.RC3 = false;
+			explore.queriesFinished.TwoMASS = false;
+			explore.queriesFinished.WISE = false;
+			explore.queriesFinished.spectra = false;
+			explore.queriesFinished.manga = false;
+			explore.queriesFinished.apogee = false;
+			explore.queriesFinished.visits = false;
+			$("#ex-hour").prop("style", "");
 			var target = explore.targets.data;
 			target.data.Query = "SELECT dbo.fPhotoTypeN(p.type) AS Type, p.ra, p.dec, p.run, p.rerun, p.camcol, p.field, p.obj, p.specObjID, p.objID, p.l, p.b, p.type, p.u, p.g, p.r, p.i, p.z AS pz, p.err_u, p.err_g, p.err_r, p.err_i, p.err_z, p.flags, p.mjd AS ImageMJD, dbo.fMjdToGMT(p.mjd) AS ImageMJDString, dbo.fPhotoModeN(p.mode) AS Mode, p.parentID, p.nChild, p.extinction_r, p.petroRad_r, p.petroRadErr_r, Photoz.z AS Photoz, Photoz.zerr AS Photoz_err, zooSpec.spiral AS Zoo1Morphology_spiral, zooSpec.elliptical AS Zoo1Morphology_elliptical, zooSpec.uncertain AS Zoo1Morphology_uncertain, s.instrument, s.class, s.z, s.zErr, s.survey, s.programname, s.sourcetype, s.velDisp, s.velDispErr, s.plate, s.mjd AS specMJD, s.fiberID FROM PhotoObjAll AS p LEFT JOIN Photoz ON Photoz.objID = p.objID LEFT JOIN zooSpec ON zooSpec.objID = p.objID LEFT JOIN SpecObjAll AS s ON s.specObjID = p.specObjID WHERE p.objID=" + explore.attributes.objID;
 			$.ajax(target);
@@ -1723,11 +1794,10 @@
 			
 			target = explore.targets.spectra;
 			//Still need to find function for legacy_target2
-			target.data.Query = "select a.specObjID, a.img, a.fiberID, a.mjd, a.plate, a.survey, a.programname, a.instrument,a.sourceType,a.z, a.zErr, dbo.fSpecZWarningN(a.zWarning) as WARNING, a.sciencePrimary, dbo.fPrimTargetN(a.legacy_target1) as targetOne, a.legacy_target2 as targetTwo, a.class as CLASS, a.velDisp, a.velDispErr from SpecObjAll a where bestObjID=" + explore.attributes.objID;
+			target.data.Query = "select top 1 a.bestObjID,a.specObjID, a.img, a.fiberID, a.mjd, a.plate, a.survey, a.programname, a.instrument,a.sourceType,a.z, a.zErr, dbo.fSpecZWarningN(a.zWarning) as WARNING, a.sciencePrimary, dbo.fPrimTargetN(a.legacy_target1) as targetOne, a.legacy_target2 as targetTwo, a.class as CLASS, a.velDisp, a.velDispErr from SpecObjAll a where bestObjID=" + explore.attributes.objID+" order by a.sciencePrimary DESC";
 			$.ajax(target);
 			
 			target = explore.targets.manga;
-			//target.data.Query = "select h.ifura, h.ifudec, h.mangaid, h.mngtarg1, h.mngtarg2, h.mngtarg3,h.objdec, h.objra, h.plateifu, h.mjdmax, h.redsn2, h.drp3qual, h.bluesn2 from mangaDRPall h where h.mangaid='12-193481'";
 			target.data.Query = "select * from dbo.fGetNearestMangaObjEq(" + explore.attributes.ra + "," + explore.attributes.dec + ",0.5)";
 			$.ajax(target);
 			
@@ -1773,6 +1843,8 @@
 			contents += ('<br>' + explore.formatLineTwo(dict));
 			$(container).html(contents);
 			explore.doCollapse(explore.context + ' .ex-data-wrap>h2>a[data-toggle]', $("#ex-data-outer"), show );
+			explore.queriesFinished.data = true;
+			explore.updateHour();
 		},
 		
 		displayImaging: function( dict, binFlags, show) {
@@ -1780,66 +1852,88 @@
 			var contents = explore.formatImaging(dict, binFlags);
 			$(container).html(contents);
 			explore.doCollapse(explore.context + ' .ex-imaging-wrap>h2>a[data-toggle]', $("#ex-imaging-outer"), show );
+			explore.queriesFinished.imaging = true;
+			explore.updateHour();
 		},
 		
 		displayUSNO: function(dict, show) {
 			var container = $("#ex-cross-USNO");
 			var contents = explore.formatUSNO(dict);
 			$(container).html(contents);
+			explore.queriesFinished.USNO = true;
+			explore.updateHour();
 		},
 		
 		displayFIRST: function(dict, show) {
 			var container = $("#ex-cross-FIRST");
 			var contents = explore.formatFIRST(dict);
 			$(container).html(contents);
+			explore.queriesFinished.FIRST = true;
+			explore.updateHour();
 		},
 		
 		displayROSAT: function(dict, show) {
 			var container = $("#ex-cross-ROSAT");
 			var contents = explore.formatROSAT(dict);
 			$(container).html(contents);
+			explore.queriesFinished.ROSAT = true;
+			explore.updateHour();
 		},
 		
 		displayRC3: function(dict, show) {
 			var container = $("#ex-cross-RC3");
 			var contents = explore.formatRC3(dict);
 			$(container).html(contents);
+			explore.queriesFinished.RC3 = true;
+			explore.updateHour();
 		},
 		
 		displayTwoMASS: function(dict, show) {
 			var container = $("#ex-cross-TwoMASS");
 			var contents = explore.formatTwoMASS(dict);
 			$(container).html(contents);
+			explore.queriesFinished.TwoMASS = true;
+			explore.updateHour();
 		},
 		
 		displayWISE: function(dict, show) {
 			var container = $("#ex-cross-WISE");
 			var contents = explore.formatWISE(dict);
 			$(container).html(contents);
+			explore.queriesFinished.WISE = true;
+			explore.updateHour();
 		},
 		
-		displaySpectra: function(dict, show) {
+		displaySpectra: function(dict, count, show) {
 			var container = $("#ex-spectra");
-			var contents = explore.formatSpectra(dict);
+			var contents = explore.formatSpectra(dict, count);
 			$(container).html(contents);
+			explore.queriesFinished.spectra = true;
+			explore.updateHour();
 		},
 		
 		displayManga: function(dict, show) {
 			var container = $("#ex-manga");
 			var contents = explore.formatManga(dict);
 			$(container).html(contents);
+			explore.queriesFinished.manga = true;
+			explore.updateHour();
 		},
 		
 		displayApogee: function(dict, show) {
 			var container = $("#ex-apogee");
 			var contents = explore.formatApogee(dict);
 			$(container).html(contents);
+			explore.queriesFinished.apogee = true;
+			explore.updateHour();
 		},
 		
 		displayVisits: function(input, show) {
 			var container = $("#ex-visits");
 			var contents = explore.formatVisits(input);
 			$(container).html(contents);
+			explore.queriesFinished.visits = true;
+			explore.updateHour();
 		},
 		
 		formatVisits: function(input) {
@@ -1881,7 +1975,6 @@
 			output += ('<img style="-webkit-user-select: none;" src='+imLink+'>');
 			output += ('<table class="table-responsive"><tr><td><a href="http://dr15.sdss.org/infrared/spectrum/view/stars?location_id='+apstar[4]+'&commiss='+dict.commiss+'&apogee_id='+dict.apogee_id+'&action=search" target="_blank">Interactive Spectrum</a></td>');
 			output += ('<td><a href="http://dr15.sdss.org/sas/dr15/'+apstar[0]+'/spectro/redux/r8/stars/'+apstar[1]+'/'+apstar[4]+'/apStar-r8-'+apstar[5].replace("+","%2b")+'.fits">Download FITS</a></td></tr></table>');
-			//output += '<img style="-webkit-user-select: none;" src="https://dr15.sdss.org/sas/dr15/apogee/spectro/redux/r8/stars/apo25m/4128/plots/apStar-r8-2M13102744%2b1826172.jpg">';
 			output += '<h4>Targeting Information</h4>';
 			output += '<table class="table-bordered table-responsive"><tr><th>2MASS j</th><th>2MASS h</th><th>2MASS k</th><th>j_err</th><th>h_err</th><th>k_err</th></tr>';
 			output += ('<tr><td>'+dict.j+'</td><td>'+dict.h+'</td><td>'+dict.k+'</td><td>'+dict.j_err+'</td><td>'+dict.h_err+'</td><td>'+dict.k_err+'</td></tr></table>');
@@ -1917,14 +2010,13 @@
 			output += ('<tr><td>'+dict.drp3qual+'</td><td>'+dict.bluesn2+'</td><td>'+dict.redsn2+'</td><td>'+dict.mjdmax+'</td><td>'+dict.mngtarg1+'</td><td>'+dict.mngtarg2+'</td><td>'+dict.mngtarg3+'</td></tr></table></div>');
 			return output;
 		},
-		//Not complete
-		formatSpectra: function(dict) {
+		formatSpectra: function(dict, countDict) {
 			var output = '<strong>SpecObjID</strong> = ' + dict.specObjID +'<br>';
 			output += ('<div><a href="http://skyserver.sdss.org/dr15/en/get/SpecById.ashx?id='+dict.specObjID+'" target="_blank">View Larger</a></div>');
 			output += ('<img style="-webkit-user-select: none;" src="http://skyserver.sdss.org/dr15/en/get/SpecById.ashx?id='+dict.specObjID+'" width="400" height="400" class="left">');
 			output += ('<div class="spectra-table"><table class="table-bordered table-responsive"><tr><th>Spectrograph</th><td>'+dict.instrument+'</td></tr><tr><th>class</th><td>'+dict.CLASS+'</td></tr><tr><th>Redshift (z)</th><td>'+dict.z+'</td></tr>');
 			output += ('<tr><th>Redshift error</th><td>'+dict.zErr+'</td></tr><tr><th>Redshift flags</th><td>'+dict.WARNING+'</td></tr><tr><th>survey</th><td>'+dict.survey+'</td></tr><tr><th>programname</th><td>'+dict.programname+'</td></tr><tr><th>primary</th><td>'+dict.sciencePrimary+'</td></tr>');
-			output += ('<tr><th>Other spec</th><td></td></tr><tr><th>sourcetype</th><td>'+dict.sourceType+'</td></tr><tr><th>Velocity dispersion (km/s)</th><td>'+dict.velDisp+'</td></tr><tr><th>veldisp_error</th><td>'+dict.velDispErr+'</td></tr>');
+			output += ('<tr><th>Other spec</th><td>'+(parseInt(countDict.count)-1).toString()+'</td></tr><tr><th>sourcetype</th><td>'+dict.sourceType+'</td></tr><tr><th>Velocity dispersion (km/s)</th><td>'+dict.velDisp+'</td></tr><tr><th>veldisp_error</th><td>'+dict.velDispErr+'</td></tr>');
 			output += ('<tr><th>targeting_flags</th><td>'+dict.targetOne+'</td></tr><tr><th>plate</th><td>'+dict.plate+'</td></tr><tr><th>mjd</th><td>'+dict.mjd+'</td></tr><tr><th>fiberid</th><td>'+dict.fiberID+'</td></tr></table></div>');
 			return output;
 		},
@@ -2134,6 +2226,12 @@
 			var minutes = Math.trunc((num / 15 - hours) * 60);
 			var seconds = parseFloat(Math.round(((num / 15 - hours) * 60 - minutes) * 60 * 100) / 100).toFixed(2);
 			return (prepend + hours.toString() + ":" + minutes.toString() + ":" + seconds.toString());
+		},
+		
+		updateHour: function() {
+			if((((explore.queriesFinished.data && explore.queriesFinished.imaging) && (explore.queriesFinished.USNO && explore.queriesFinished.FIRST)) && ((explore.queriesFinished.ROSAT && explore.queriesFinished.RC3) && (explore.queriesFinished.TwoMASS && explore.queriesFinished.WISE))) && (explore.queriesFinished.spectra && explore.queriesFinished.manga) && (explore.queriesFinished.apogee && explore.queriesFinished.visits)) {
+				$("#ex-hour").prop("style", "display: none;");
+			}
 		}
 	};
 
