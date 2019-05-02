@@ -11,6 +11,7 @@ $result .= '<div class="row">
 			<h2><a name="explore" role="button" data-toggle="collapse" href="#ex-form" aria-expanded="true" aria-controls="ex-form">Explore Tool</a></h2>
 			<div class="form ex-form">
 				<form id="ex-form" class="ex-form collapse">
+					<div id="default-value" style="display:none;" data-value='.$default.'></div>
 					<div id="ex-hour" class="ex-hour" style="display: none;"><span class="glyphicon glyphicon-hourglass"></span></div>
 					<div class="ex-search-wrap">
 						<a name="search" role="button" data-toggle="collapse" href="#ex-search-outer" aria-expanded="false" aria-controls="ex-search">Search</a>

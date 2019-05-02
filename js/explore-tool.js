@@ -1674,7 +1674,10 @@
 		},
 			
 		init: function(){
-			this.doSearch();
+			explore.attributes.objID = $("#default-value").attr('data-value');
+			var target = explore.targets.radecFromObj;
+			target.data.Query = "select ra,dec from PhotoObjAll where objID=" + explore.attributes.objID;
+			$.ajax(target);
 			this.showForm( explore.context , false , true );
 			$(document).on('click', "#Name_button", explore.nameSearch);
 			$(document).on('click', "#SpecObjID_button", explore.specObjSearch);

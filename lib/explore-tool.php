@@ -114,12 +114,20 @@ final class ExploreTool {
 		wp_enqueue_script( 'explore-tool-script' );
 		wp_enqueue_style( 'explore-tool-style' );
 		
+		$default = "";
+		if(!empty( $atts) && array_key_exists( 'default' , $atts )) {
+			$default = $atts['default'];
+		}
+		else {
+			$default = "1237662301903192106";
+		}
+		
 		if ( defined( 'EX_DEVELOP' ) && EX_DEVELOP ) 
 			wp_enqueue_script( 'bootstrap' );
 		else
 			wp_enqueue_script( 'bootstrap-min' );
 		
-		return $this->getForm( $which , $display , $webroot);
+		return $this->getForm( $which , $display , $webroot, $default);
 	}
 	
 	public function getContextName() {
@@ -129,7 +137,7 @@ final class ExploreTool {
 	/**
 	 * Generate HTML for this form
 	 */
-	public function getForm( $which , $display , $webroot) {
+	public function getForm( $which , $display , $webroot, $default) {
 		//Content 
 		$result = '<div id="ex-container" class="ex-wrap" data-ex-webroot="' . $webroot . '" data-ex-which="' . $which . '" data-ex-display="' . $display . '" >';
 		require($this->includes_dir . 'form-'. $which . '.php'); 
