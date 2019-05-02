@@ -8,4 +8,5 @@ Once a search is completed, the data for that object will be displayed below. Po
 <h2>Installation and Implementation</h2>
 To install ExploreTool on a WordPress site, download the zip file of ExploreTool and extract it. Then, copy the entire folder into the wp-content/plugins directory for your site. ExploreTool should now be available under "Plugins" in the wp-admin dashboard. Click "activate" to enable the plugin on your site. 
 <br><br>
-Once installed, ExploreTool can be implemented on a page using the following shortcode: [explore-tool]. 
+Once installed, ExploreTool can be implemented on a page using the following shortcode: [explore-tool].
+This shortcode has one optional argument, default. This argument provides an objID for the default data displayed by the tool. Example: [explore-tool default="1237668296598749280"]
