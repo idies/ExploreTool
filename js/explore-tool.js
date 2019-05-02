@@ -1,4 +1,4 @@
-/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-04-26 */+function ($) {
+/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-05-02 */+function ($) {
   'use strict';
 
   // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
@@ -1402,12 +1402,13 @@
 		targets: {
 		data:{
 			//put back in https:
-		    url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
-		    ContentType:"application/json",
+		    url:"",
+		    //ContentType:"application/json",
 		    type: "POST",
-		    data:{"Query":"","Accept":"application/xml"},
+		    //data:{"Query":"","Accept":"application/xml"},
 		    success: function (data) {
-				if(data === "\n") {
+				//console.log(data);
+				if(data.split("\n")[2] === "") {
 					$("ex-data").html(data);
 					explore.queriesFinished.data = true;
 					explore.queriesFinished.imaging = true;
@@ -1420,12 +1421,12 @@
 		    }
 		},
 		USNO:{
-			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
-			ContentType:"application/json",
+			url:"",
+			//ContentType:"application/json",
 			type: "POST",
-		    data:{"Query":"","Accept":"application/xml"},
+		    //data:{"Query":"","Accept":"application/xml"},
 			success: function (data) {
-				if(data === "\n") {
+				if(data.split("\n")[2] === "") {
 					data = "There is no USNO data available for this object";
 					$("#ex-cross-USNO").html(data);
 					explore.queriesFinished.USNO = true;
@@ -1437,12 +1438,12 @@
 		    }
 		},
 		FIRST:{
-			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
-			ContentType:"application/json",
+			url:"",
+			//ContentType:"application/json",
 			type: "POST",
-		    data:{"Query":"","Accept":"application/xml"},
+		    //data:{"Query":"","Accept":"application/xml"},
 			success: function (data) {
-				if(data === "\n") {
+				if(data.split("\n")[2] === "") {
 					data = "There is no FIRST data available for this object";
 					$("#ex-cross-FIRST").html(data);
 					explore.queriesFinished.FIRST = true;
@@ -1454,12 +1455,12 @@
 		    }
 		},
 		ROSAT:{
-			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
-			ContentType:"application/json",
+			url:"",
+			//ContentType:"application/json",
 			type: "POST",
-		    data:{"Query":"","Accept":"application/xml"},
+		   // data:{"Query":"","Accept":"application/xml"},
 			success: function (data) {
-				if(data === "\n") {
+				if(data.split("\n")[2] === "") {
 					data = "There is no ROSAT data available for this object";
 					$("#ex-cross-ROSAT").html(data);
 					explore.queriesFinished.ROSAT = true;
@@ -1471,12 +1472,13 @@
 		    }
 		},
 		RC3:{
-			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
-			ContentType:"application/json",
+			url:"",
+			//ContentType:"application/json",
 			type: "POST",
-		    data:{"Query":"","Accept":"application/xml"},
+		    //data:{"Query":"","Accept":"application/xml"},
 			success: function (data) {
-				if(data === "\n") {
+				console.log(explore.targets.RC3.url);
+				if(data.split("\n")[2] === "") {
 					data = "There is no RC3 data available for this object";
 					$("#ex-cross-RC3").html(data);
 					explore.queriesFinished.RC3 = true;
@@ -1488,12 +1490,12 @@
 		    }
 		},
 		TwoMASS:{
-			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
-			ContentType:"application/json",
+			url:"",
+			//ContentType:"application/json",
 			type: "POST",
-		    data:{"Query":"","Accept":"application/xml"},
+		    //data:{"Query":"","Accept":"application/xml"},
 			success: function (data) {
-				if(data === "\n") {
+				if(data.split("\n")[2] === "") {
 					data = "There is no TwoMASS data available for this object";
 					$("#ex-cross-TwoMASS").html(data);
 					explore.queriesFinished.TwoMASS = true;
@@ -1505,12 +1507,12 @@
 		    }
 		},
 		WISE:{
-			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
-			ContentType:"application/json",
+			url:"",
+			//ContentType:"application/json",
 			type: "POST",
-		    data:{"Query":"","Accept":"application/xml"},
+		    //data:{"Query":"","Accept":"application/xml"},
 			success: function (data) {
-				if(data === "\n") {
+				if(data.split("\n")[2] === "") {
 					data = "There is no WISE data available for this object";
 					$("#ex-cross-WISE").html(data);
 					explore.queriesFinished.WISE = true;
@@ -1522,12 +1524,12 @@
 		    }
 		},
 		spectra:{
-			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
-			ContentType:"application/json",
+			url:"",
+			//ContentType:"application/json",
 			type: "POST",
-		    data:{"Query":"","Accept":"application/xml"},
+		    //data:{"Query":"","Accept":"application/xml"},
 			success: function (data) {
-				if(data === "\n") {
+				if(data.split("\n")[2] === "") {
 					data = "There is no Optical Spectra data available for this object";
 					$("#ex-spectra").html(data);
 					explore.queriesFinished.spectra = true;
@@ -1535,18 +1537,18 @@
 				} else {
 					explore.specData = explore.convertDict(data);
 					var target = explore.targets.spectraCount;
-					target.data.Query = "select count(SpecObjID) as count from SpecObjAll where bestObjID="+explore.specData.bestObjID;
+					target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select count(SpecObjID) as count from SpecObjAll where bestObjID="+explore.specData.bestObjID+"&format=csv";
 					$.ajax(target);
 				}
 		    }
 		},
 		spectraCount:{
-			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
-			ContentType:"application/json",
+			url:"",
+			//ContentType:"application/json",
 			type: "POST",
-		    data:{"Query":"","Accept":"application/xml"},
+		   // data:{"Query":"","Accept":"application/xml"},
 			success: function (data) {
-				if(data === "\n") {
+				if(data.split("\n")[2] === "") {
 					data = "There is no Optical Spectra data available for this object";
 					$("#ex-spectra").html(data);
 					explore.queriesFinished.spectra = true;
@@ -1557,12 +1559,12 @@
 		    }
 		},
 		manga:{
-			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
-			ContentType:"application/json",
+			url:"",
+			//ContentType:"application/json",
 			type: "POST",
-		    data:{"Query":"","Accept":"application/xml"},
+		    //data:{"Query":"","Accept":"application/xml"},
 			success: function (data) {
-				if(data === "\n") {
+				if(data.split("\n")[2] === "") {
 					data = "There is no MaNGA data available for this object";
 					$("#ex-manga").html(data);
 					explore.queriesFinished.manga = true;
@@ -1574,12 +1576,12 @@
 		    }
 		},
 		apogee:{
-			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
-			ContentType:"application/json",
+			url:"",
+			//ContentType:"application/json",
 			type: "POST",
-		    data:{"Query":"","Accept":"application/xml"},
+		    //data:{"Query":"","Accept":"application/xml"},
 			success: function (data) {
-				if(data === "\n") {
+				if(data.split("\n")[2] === "") {
 					data = "There is no Apogee data available for this object";
 					$("#ex-apogee").html(data);
 					explore.queriesFinished.apogee = true;
@@ -1591,12 +1593,12 @@
 		    }
 		},
 		visits:{
-			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
-			ContentType:"application/json",
+			url:"",
+			//ContentType:"application/json",
 			type: "POST",
-		    data:{"Query":"","Accept":"application/xml"},
+		    //data:{"Query":"","Accept":"application/xml"},
 			success: function (data) {
-				if(data === "\n") {
+				if(data.split("\n")[2] === "") {
 					data = "There is no Visits data available for this object";
 					$("#ex-visits").html(data);
 					explore.queriesFinished.visits = true;
@@ -1607,12 +1609,12 @@
 		    }
 		},
 		radecFromObj:{
-			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
-			ContentType:"application/json",
+			url:"",
+			//ContentType:"application/json",
 			type: "POST",
-		    data:{"Query":"","Accept":"application/xml"},
+		    //data:{"Query":"","Accept":"application/xml"},
 			success: function (data) {
-				if(data === "\n") {
+				if(data.split("\n")[2] === "") {
 					explore.attributes.ra = "";
 					explore.attributes.dec = "";
 				} else {
@@ -1624,12 +1626,12 @@
 		    }
 		},
 		objFromRaDec:{
-			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
-			ContentType:"application/json",
+			url:"",
+			//ContentType:"application/json",
 			type: "POST",
-		    data:{"Query":"","Accept":"application/xml"},
+		   // data:{"Query":"","Accept":"application/xml"},
 			success: function (data) {
-				if(data === "\n") {
+				if(data.split("\n")[2] === "") {
 					explore.attributes.objID = "";
 				} else {
 					var dict = explore.convertDict(data);
@@ -1639,19 +1641,19 @@
 		    }
 		},
 		objFromOther:{
-			url:"//skyserver.sdss.org/casjobs/RestAPI/contexts/dr15/query",
-			ContentType:"application/json",
+			url:"",
+			//ContentType:"application/json",
 			type: "POST",
-		    data:{"Query":"","Accept":"application/xml"},
+		    //data:{"Query":"","Accept":"application/xml"},
 			success: function (data) {
-				if(data === "\n") {
+				if(data.split("\n")[2] === "") {
 					explore.attributes.objID = "";
 				} else {
 					var dict = explore.convertDict(data);
 					explore.attributes.objID = dict.objID;
 				}
 				var target = explore.targets.radecFromObj;
-				target.data.Query = "select ra,dec from PhotoObjAll where objID=" + explore.attributes.objID;
+				target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select ra,dec from PhotoObjAll where objID=" + explore.attributes.objID+"&format=csv";
 				$.ajax(target);
 		    }
 		},
@@ -1659,7 +1661,7 @@
 			url:"",
 			type: "GET",
 			success: function (data) {
-				if(data === "\n") {
+				if(data.split("\n")[2] === "") {
 					explore.attributes.ra = "";
 					explore.attributes.dec = "";
 				} else {
@@ -1667,7 +1669,7 @@
 					explore.attributes.dec = data.data[0][1].toString();
 				}
 				var target = explore.targets.objFromRaDec;
-				target.data.Query = "select top 1 dbo.fGetNearestObjIdAllEq("+explore.attributes.ra+","+explore.attributes.dec+",0.5) as objID";
+				target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select top 1 dbo.fGetNearestObjIdAllEq("+explore.attributes.ra+","+explore.attributes.dec+",0.5) as objID&format=csv";
 				$.ajax(target);
 		    }
 		}
@@ -1697,16 +1699,16 @@
 			var target;
 			if(value.includes(".")) {
 				target = explore.targets.objFromOther;
-				target.data.Query = "select top 1 ra,dec,dbo.fGetNearestObjIdAllEq(ra,dec,0.5) as objID from apogeeStar where apstar_id='" + value + "'";
+				target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select top 1 ra,dec,dbo.fGetNearestObjIdAllEq(ra,dec,0.5) as objID from apogeeStar where apstar_id='" + value + "'&format=csv";
 				$.ajax(target);
 			} else if(value.includes("+")) {
 				target = explore.targets.objFromOther;
-				target.data.Query = "select top 1 ra,dec,dbo.fGetNearestObjIdAllEq(ra,dec,0.5) as objID from apogeeStar where apogee_id='" + value + "'";
+				target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select top 1 ra,dec,dbo.fGetNearestObjIdAllEq(ra,dec,0.5) as objID from apogeeStar where apogee_id='" + value + "'&format=csv";
 				$.ajax(target);
 				
 			} else {
 				target = explore.targets.objFromOther;
-				target.data.Query = "select bestObjID as objID from SpecObjAll where specObjID=" + value;
+				target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select bestObjID as objID from SpecObjAll where specObjID=" + value + "&format=csv";
 				$.ajax(target);
 			}
 		},
@@ -1715,21 +1717,21 @@
 			explore.attributes.ra = $("#Ra").attr('value');
 			explore.attributes.dec = $("#Dec").attr('value');
 			var target = explore.targets.objFromRaDec;
-			target.data.Query = "select top 1 dbo.fGetNearestObjIdAllEq("+explore.attributes.ra+","+explore.attributes.dec+",0.5) as objID";
+			target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select top 1 dbo.fGetNearestObjIdAllEq("+explore.attributes.ra+","+explore.attributes.dec+",0.5) as objID&format=csv";
 			$.ajax(target);
 		},
 		
 		sdssSearch: function(e) {
 			var values = ($("#SDSS").attr('value')).split("-");
 			var target = explore.targets.objFromOther;
-			target.data.Query = "select top 1 objID from PhotoObjAll where run="+values[0]+" and rerun="+values[1]+" and camcol="+values[2]+" and field="+values[3]+" and obj="+values[4];
+			target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select top 1 objID from PhotoObjAll where run="+values[0]+" and rerun="+values[1]+" and camcol="+values[2]+" and field="+values[3]+" and obj="+values[4]+"&format=csv";
 			$.ajax(target);
 		},
 		
 		objSearch: function(e) {
 			explore.attributes.objID = $("#ObjID").attr('value');
 			var target = explore.targets.radecFromObj;
-			target.data.Query = "select ra,dec from PhotoObjAll where objID=" + explore.attributes.objID;
+			target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select ra,dec from PhotoObjAll where objID=" + explore.attributes.objID+"&format=csv";
 			$.ajax(target);
 			
 		},
@@ -1739,14 +1741,14 @@
 			var mjd_val = $("#MJD").attr('value');
 			var fiber_val = $("#Fiber").attr('value');
 			var target = explore.targets.objFromOther;
-			target.data.Query = "select a.objID from photoObjAll a,SpecObjAll b where a.objID=b.bestObjID and b.plate="+plate_val+" and b.mjd="+mjd_val+" and b.fiberID="+fiber_val;
+			target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select a.objID from photoObjAll a,SpecObjAll b where a.objID=b.bestObjID and b.plate="+plate_val+" and b.mjd="+mjd_val+" and b.fiberID="+fiber_val+"&format=csv";
 			$.ajax(target);
 		},
 		
 		mangaSearch: function(e) {
 			var manga = $("#MangaID").attr('value');
 			var target = explore.targets.objFromOther;
-			target.data.Query = "select top 1 objra,objdec,dbo.fGetNearestObjIdAllEq(objra,objdec,0.5) as objID from mangaDAPall where mangaid='" + manga + "'";
+			target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select top 1 objra,objdec,dbo.fGetNearestObjIdAllEq(objra,objdec,0.5) as objID from mangaDAPall where mangaid='" + manga + "'&format=csv";
 			$.ajax(target);
 		},
 		
@@ -1765,48 +1767,48 @@
 			explore.queriesFinished.visits = false;
 			$("#ex-hour").prop("style", "");
 			var target = explore.targets.data;
-			target.data.Query = "SELECT dbo.fPhotoTypeN(p.type) AS Type, p.ra, p.dec, p.run, p.rerun, p.camcol, p.field, p.obj, p.specObjID, p.objID, p.l, p.b, p.type, p.u, p.g, p.r, p.i, p.z AS pz, p.err_u, p.err_g, p.err_r, p.err_i, p.err_z, p.flags, p.mjd AS ImageMJD, dbo.fMjdToGMT(p.mjd) AS ImageMJDString, dbo.fPhotoModeN(p.mode) AS Mode, p.parentID, p.nChild, p.extinction_r, p.petroRad_r, p.petroRadErr_r, Photoz.z AS Photoz, Photoz.zerr AS Photoz_err, zooSpec.spiral AS Zoo1Morphology_spiral, zooSpec.elliptical AS Zoo1Morphology_elliptical, zooSpec.uncertain AS Zoo1Morphology_uncertain, s.instrument, s.class, s.z, s.zErr, s.survey, s.programname, s.sourcetype, s.velDisp, s.velDispErr, s.plate, s.mjd AS specMJD, s.fiberID FROM PhotoObjAll AS p LEFT JOIN Photoz ON Photoz.objID = p.objID LEFT JOIN zooSpec ON zooSpec.objID = p.objID LEFT JOIN SpecObjAll AS s ON s.specObjID = p.specObjID WHERE p.objID=" + explore.attributes.objID;
+			target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=SELECT dbo.fPhotoTypeN(p.type) AS Type, p.ra, p.dec, p.run, p.rerun, p.camcol, p.field, p.obj, p.specObjID, p.objID, p.l, p.b, p.type, p.u, p.g, p.r, p.i, p.z AS pz, p.err_u, p.err_g, p.err_r, p.err_i, p.err_z, p.flags, p.mjd AS ImageMJD, dbo.fMjdToGMT(p.mjd) AS ImageMJDString, dbo.fPhotoModeN(p.mode) AS Mode, p.parentID, p.nChild, p.extinction_r, p.petroRad_r, p.petroRadErr_r, Photoz.z AS Photoz, Photoz.zerr AS Photoz_err, zooSpec.spiral AS Zoo1Morphology_spiral, zooSpec.elliptical AS Zoo1Morphology_elliptical, zooSpec.uncertain AS Zoo1Morphology_uncertain, s.instrument, s.class, s.z, s.zErr, s.survey, s.programname, s.sourcetype, s.velDisp, s.velDispErr, s.plate, s.mjd AS specMJD, s.fiberID FROM PhotoObjAll AS p LEFT JOIN Photoz ON Photoz.objID = p.objID LEFT JOIN zooSpec ON zooSpec.objID = p.objID LEFT JOIN SpecObjAll AS s ON s.specObjID = p.specObjID WHERE p.objID=" + explore.attributes.objID + "&format=csv";
 			$.ajax(target);
 			
 			target = explore.targets.USNO;
-			target.data.Query = "select PROPERMOTION, MURAERR, MUDECERR, ANGLE from USNO where OBJID=" + explore.attributes.objID;
+			target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select PROPERMOTION, MURAERR, MUDECERR, ANGLE from USNO where OBJID=" + explore.attributes.objID + "&format=csv";
 			$.ajax(target);
 			
 			target = explore.targets.FIRST;
-			target.data.Query = "select f.peak,f.rms,f.major,f.minor from FIRST f where f.objID=" + explore.attributes.objID;
+			target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select f.peak,f.rms,f.major,f.minor from FIRST f where f.objID=" + explore.attributes.objID + "&format=csv";
 			$.ajax(target);
 			
 			target = explore.targets.ROSAT;
-			target.data.Query = "select q.CPS, q.HR1,q.HR2,q.EXT from ROSAT q where q.OBJID=" + explore.attributes.objID;
+			target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select q.CPS, q.HR1,q.HR2,q.EXT from ROSAT q where q.OBJID=" + explore.attributes.objID + "&format=csv";
 			$.ajax(target);
 			
 			target = explore.targets.RC3;
-			target.data.Query = "select r.HUBBLE, r.M21, r.M21ERR, r.HI from RC3 r where r.objID=" + explore.attributes.objID;
+			target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select r.HUBBLE, r.M21, r.M21ERR, r.HI from RC3 r where r.objID=" + explore.attributes.objID + "&format=csv";
 			$.ajax(target);
 			
 			target = explore.targets.TwoMASS;
-			target.data.Query = "select j,h,k, phQual from TwoMASS s where s.OBJID=" + explore.attributes.objID;
+			target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select j,h,k, phQual from TwoMASS s where s.OBJID=" + explore.attributes.objID + "&format=csv";
 			$.ajax(target);
 			
 			target = explore.targets.WISE;
-			target.data.Query = "select TwoMASS.OBJID, t.w1mag, t.w2mag, t.w3mag, t.w4mag from WISE_allsky t, TwoMASS where t.tmass_key=TwoMASS.ptsKey and TwoMASS.OBJID=" + explore.attributes.objID;
+			target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select TwoMASS.OBJID, t.w1mag, t.w2mag, t.w3mag, t.w4mag from WISE_allsky t, TwoMASS where t.tmass_key=TwoMASS.ptsKey and TwoMASS.OBJID=" + explore.attributes.objID + "&format=csv";
 			$.ajax(target);
 			
 			target = explore.targets.spectra;
 			//Still need to find function for legacy_target2
-			target.data.Query = "select top 1 a.bestObjID,a.specObjID, a.img, a.fiberID, a.mjd, a.plate, a.survey, a.programname, a.instrument,a.sourceType,a.z, a.zErr, dbo.fSpecZWarningN(a.zWarning) as WARNING, a.sciencePrimary, dbo.fPrimTargetN(a.legacy_target1) as targetOne, a.legacy_target2 as targetTwo, a.class as CLASS, a.velDisp, a.velDispErr from SpecObjAll a where bestObjID=" + explore.attributes.objID+" order by a.sciencePrimary DESC";
+			target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select top 1 a.bestObjID,a.specObjID, a.img, a.fiberID, a.mjd, a.plate, a.survey, a.programname, a.instrument,a.sourceType,a.z, a.zErr, dbo.fSpecZWarningN(a.zWarning) as WARNING, a.sciencePrimary, dbo.fPrimTargetN(a.legacy_target1) as targetOne, a.legacy_target2 as targetTwo, a.class as CLASS, a.velDisp, a.velDispErr from SpecObjAll a where bestObjID=" + explore.attributes.objID+" order by a.sciencePrimary DESC&format=csv";
 			$.ajax(target);
 			
 			target = explore.targets.manga;
-			target.data.Query = "select * from dbo.fGetNearestMangaObjEq(" + explore.attributes.ra + "," + explore.attributes.dec + ",0.5)";
+			target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select * from dbo.fGetNearestMangaObjEq(" + explore.attributes.ra + "," + explore.attributes.dec + ",0.5)&format=csv";
 			$.ajax(target);
 			
 			target = explore.targets.apogee;
-			target.data.Query = "select b.apogee_id, dbo.fApogeeStarFlagN(m.starflag) as starflag,dbo.fApogeeAspcapFlagN(a.aspcapflag) as ascapflag,a.teff,a.teff_err,a.logg,a.logg_err,a.fe_h,a.fe_h_err,a.alpha_m,a.alpha_m_err,m.vhelio_avg,m.vscatter,dbo.fApogeeTarget1N(m.apogee_target1) as target1,dbo.fApogeeTarget2N(m.apogee_target2) as target2,m.commiss,p.ra,p.dec,m.glon,m.glat,p.apogee_id,m.apstar_id,p.j,p.j_err,p.h,p.h_err,p.k,p.k_err, p.irac_4_5, p.irac_4_5_err, p.src_4_5 from apogeeObject p, apogeeStar m, aspcapStar a, dbo.fGetNearestApogeeStarEq(" + explore.attributes.ra + "," + explore.attributes.dec + ",0.5) b where p.apogee_id=b.apogee_id and a.apogee_id=b.apogee_id and m.apogee_id=b.apogee_id";
+			target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select b.apogee_id, dbo.fApogeeStarFlagN(m.starflag) as starflag,dbo.fApogeeAspcapFlagN(a.aspcapflag) as ascapflag,a.teff,a.teff_err,a.logg,a.logg_err,a.fe_h,a.fe_h_err,a.alpha_m,a.alpha_m_err,m.vhelio_avg,m.vscatter,dbo.fApogeeTarget1N(m.apogee_target1) as target1,dbo.fApogeeTarget2N(m.apogee_target2) as target2,m.commiss,p.ra,p.dec,m.glon,m.glat,p.apogee_id,m.apstar_id,p.j,p.j_err,p.h,p.h_err,p.k,p.k_err, p.irac_4_5, p.irac_4_5_err, p.src_4_5 from apogeeObject p, apogeeStar m, aspcapStar a, dbo.fGetNearestApogeeStarEq(" + explore.attributes.ra + "," + explore.attributes.dec + ",0.5) b where p.apogee_id=b.apogee_id and a.apogee_id=b.apogee_id and m.apogee_id=b.apogee_id&format=csv";
 			$.ajax(target);
 			
 			target = explore.targets.visits;
-			target.data.Query = "select a.visit_id, a.plate, a.mjd, a.fiberid, dbo.fMjdToGMT(a.mjd) as string, a.vrel, b.apogee_id from apogeeVisit a, dbo.fGetNearestApogeeStarEq(" + explore.attributes.ra + "," + explore.attributes.dec + ",0.5) b where a.apogee_id=b.apogee_id order by mjd";
+			target.url = "//skyserver.sdss.org/dr15/SkyServerWS/SearchTools/SqlSearch?cmd=select a.visit_id, a.plate, a.mjd, a.fiberid, dbo.fMjdToGMT(a.mjd) as string, a.vrel, b.apogee_id from apogeeVisit a, dbo.fGetNearestApogeeStarEq(" + explore.attributes.ra + "," + explore.attributes.dec + ",0.5) b where a.apogee_id=b.apogee_id order by mjd&format=csv";
 			$.ajax(target);
 		},
 		
@@ -2061,8 +2063,8 @@
 		convertDict: function(data) {
 			var output = '{';
 			var lines = data.split('\n');
-			var header = lines[0].split(',');
-			var items = lines[1].split(',');
+			var header = lines[1].split(',');
+			var items = lines[2].split(',');
 			for(var i = 0; i < items.length; i++) {
 				if(!items[i].startsWith('"')) {
 					output += ('"' + header[i] + '":"' + items[i] + '"');
