@@ -1,4 +1,4 @@
-/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-04-26 */+function ($) {
+/*! SQLSearchWP-Casjobs - v1.0.0 - by:1.0.0 - license: - 2019-05-02 */+function ($) {
   'use strict';
 
   // CSS TRANSITION SUPPORT (Shoutout: http://www.modernizr.com/)
@@ -1686,6 +1686,7 @@
 		},
 		
 		nameSearch: function(e) {
+			explore.resetData();
 			var value = $("#Name").attr('value');
 			var target = explore.targets.radecFromName;
 			target.url = "//simbad.u-strasbg.fr/simbad/sim-tap/sync?request=doQuery&lang=adql&format=json&query=SELECT%20a.ra,a.dec%20from%20basic%20as%20a,IDENT%20as%20b%20where%20a.oid=b.oidref%20and%20b.id=%27" + value + "%27";
@@ -1693,6 +1694,7 @@
 		},
 		
 		specObjSearch: function(e) {
+			explore.resetData();
 			var value = $("#SpecObjID").attr('value');
 			var target;
 			if(value.includes(".")) {
@@ -1712,6 +1714,7 @@
 		},
 		
 		ra_decSearch: function(e) {
+			explore.resetData();
 			explore.attributes.ra = $("#Ra").attr('value');
 			explore.attributes.dec = $("#Dec").attr('value');
 			var target = explore.targets.objFromRaDec;
@@ -1720,6 +1723,7 @@
 		},
 		
 		sdssSearch: function(e) {
+			explore.resetData();
 			var values = ($("#SDSS").attr('value')).split("-");
 			var target = explore.targets.objFromOther;
 			target.data.Query = "select top 1 objID from PhotoObjAll where run="+values[0]+" and rerun="+values[1]+" and camcol="+values[2]+" and field="+values[3]+" and obj="+values[4];
@@ -1727,6 +1731,7 @@
 		},
 		
 		objSearch: function(e) {
+			explore.resetData();
 			explore.attributes.objID = $("#ObjID").attr('value');
 			var target = explore.targets.radecFromObj;
 			target.data.Query = "select ra,dec from PhotoObjAll where objID=" + explore.attributes.objID;
@@ -1735,6 +1740,7 @@
 		},
 		
 		plateSearch: function(e) {
+			explore.resetData();
 			var plate_val = $("#Plate").attr('value');
 			var mjd_val = $("#MJD").attr('value');
 			var fiber_val = $("#Fiber").attr('value');
@@ -1744,6 +1750,7 @@
 		},
 		
 		mangaSearch: function(e) {
+			explore.resetData();
 			var manga = $("#MangaID").attr('value');
 			var target = explore.targets.objFromOther;
 			target.data.Query = "select top 1 objra,objdec,dbo.fGetNearestObjIdAllEq(objra,objdec,0.5) as objID from mangaDAPall where mangaid='" + manga + "'";
@@ -2232,6 +2239,21 @@
 			if((((explore.queriesFinished.data && explore.queriesFinished.imaging) && (explore.queriesFinished.USNO && explore.queriesFinished.FIRST)) && ((explore.queriesFinished.ROSAT && explore.queriesFinished.RC3) && (explore.queriesFinished.TwoMASS && explore.queriesFinished.WISE))) && (explore.queriesFinished.spectra && explore.queriesFinished.manga) && (explore.queriesFinished.apogee && explore.queriesFinished.visits)) {
 				$("#ex-hour").prop("style", "display: none;");
 			}
+		},
+		
+		resetData: function() {
+			$("#ex-data").html = "";
+			$("#ex-imaging").html = "";
+			$("#ex-cross-USNO").html = "";
+			$("#ex-cross-FIRST").html = "";
+			$("#ex-cross-ROSAT").html = "";
+			$("#ex-cross-RC3").html = "";
+			$("#ex-cross-TwoMASS").html = "";
+			$("#ex-cross-WISE").html = "";
+			$("#ex-spectra").html = "";
+			$("#ex-manga").html = "";
+			$("#ex-apogee").html = "";
+			$("#ex-visits").html = "";
 		}
 	};
 
